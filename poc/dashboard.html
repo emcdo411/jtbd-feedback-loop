@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JTBD Feedback Loop — Intelligence Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:#0a0e1a; --ink-2:#1a2035; --ink-3:#2a3248;
+  --paper:#f4f1eb; --gold:#c9a84c; --teal:#00c4b4;
+  --red:#e85454; --orange:#f07c3a; --yellow:#f5c842;
+  --green:#3dbe8a; --blue:#4a8fe8; --purple:#9b72e8;
+  --r:.75rem; --r2:1.25rem; --shadow:0 4px 24px rgba(10,14,26,0.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--paper);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse-green{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 4px var(--red)}50%{box-shadow:0 0 10px var(--red)}}
+@keyframes spin-in{from{transform:rotate(-90deg) scale(.8);opacity:0}to{transform:rotate(0) scale(1);opacity:1}}
+@keyframes node-pulse{0%,100%{box-shadow:0 0 12px rgba(0,196,180,.2)}50%{box-shadow:0 0 24px rgba(0,196,180,.45)}}
+@keyframes modal-in{from{opacity:0;transform:scale(.94) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* HEADER */
+header{position:relative;z-index:10;padding:2rem 3rem 1.5rem;border-bottom:1px solid rgba(201,168,76,.2);display:flex;align-items:flex-start;justify-content:space-between;background:linear-gradient(180deg,rgba(0,196,180,.06) 0%,transparent 100%)}
+.eyebrow{font-family:'DM Mono',monospace;font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--teal);display:inline-block}
+h1{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:400;line-height:1.1}
+h1 em{font-style:italic;color:var(--gold)}
+.header-meta{font-size:.75rem;color:rgba(244,241,235,.45);margin-top:.5rem;font-family:'DM Mono',monospace}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+.live-badge{display:flex;align-items:center;gap:.4rem;background:rgba(61,190,138,.12);border:1px solid rgba(61,190,138,.3);border-radius:2rem;padding:.3rem .8rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--green);letter-spacing:.1em}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-green 1.8s ease-in-out infinite}
+.account-tag{font-family:'DM Mono',monospace;font-size:.7rem;color:rgba(244,241,235,.5)}
+.invoca-mark{font-family:'DM Mono',monospace;font-size:.65rem;color:rgba(201,168,76,.6);display:flex;align-items:center;gap:.3rem}
+.invoca-mark::before{content:'◈'}
+
+/* MAIN GRID */
+main{position:relative;z-index:1;padding:2rem 3rem 4rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+
+/* KPI ROW */
+.kpi-row{grid-column:1/-1;display:grid;grid-template-columns:repeat(5,1fr);gap:1rem}
+.kpi{background:var(--ink-2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r2);padding:1.25rem 1.5rem;position:relative;overflow:hidden;animation:fadeUp .6s ease both}
+.kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.1s}.kpi:nth-child(3){animation-delay:.15s}.kpi:nth-child(4){animation-delay:.2s}.kpi:nth-child(5){animation-delay:.25s}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 var(--r2) var(--r2)}
+.kpi.ar::after{background:var(--red)}.kpi.ao::after{background:var(--orange)}.kpi.at::after{background:var(--teal)}.kpi.ag::after{background:var(--gold)}.kpi.agr::after{background:var(--green)}
+.kpi-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,241,235,.45);margin-bottom:.6rem}
+.kpi-value{font-family:'DM Serif Display',serif;font-size:2.4rem;line-height:1}
+.kpi-value span{font-family:'DM Mono',monospace;font-size:.75rem;color:rgba(244,241,235,.5);display:block;margin-top:.3rem}
+.kpi-value.red{color:var(--red)}.kpi-value.orange{color:var(--orange)}.kpi-value.teal{color:var(--teal)}.kpi-value.gold{color:var(--gold)}.kpi-value.green{color:var(--green)}
+
+/* PANELS */
+.panel{background:var(--ink-2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r2);overflow:hidden;animation:fadeUp .6s ease both}
+.panel-header{padding:1.1rem 1.5rem .8rem;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,241,235,.5)}
+.panel-badge{font-family:'DM Mono',monospace;font-size:.6rem;padding:.2rem .55rem;border-radius:.25rem;background:rgba(201,168,76,.12);color:var(--gold)}
+
+/* ROUTING MAP */
+.panel-routing{grid-column:1/-1}
+.routing-grid{display:grid;grid-template-columns:repeat(4,1fr);padding:1.25rem 1.5rem}
+.routing-lane{padding:0 1rem;border-right:1px solid rgba(255,255,255,.05)}
+.routing-lane:last-child{border-right:none}.routing-lane:first-child{padding-left:0}
+.lane-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.9rem;padding-bottom:.7rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.lane-icon{font-size:1rem}.lane-name{font-size:.72rem;font-weight:600;color:rgba(244,241,235,.8)}.lane-count{margin-left:auto;font-family:'DM Mono',monospace;font-size:.65rem;color:rgba(244,241,235,.35)}
+
+/* INSIGHT CARDS */
+.insight-card{background:var(--ink-3);border-radius:var(--r);padding:.85rem;margin-bottom:.65rem;border-left:3px solid transparent;cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s}
+.insight-card:last-child{margin-bottom:0}.insight-card:hover{transform:translateX(3px);box-shadow:var(--shadow);background:#2e3a52}
+.insight-card.critical{border-left-color:var(--red)}.insight-card.high{border-left-color:var(--orange)}.insight-card.medium{border-left-color:var(--yellow)}.insight-card.low{border-left-color:var(--green)}
+.card-top{display:flex;align-items:center;gap:.4rem;margin-bottom:.45rem}
+.urgency-pip{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.urgency-pip.critical{background:var(--red);animation:pulse-red 1.5s infinite}.urgency-pip.high{background:var(--orange)}.urgency-pip.medium{background:var(--yellow)}.urgency-pip.low{background:var(--green)}
+.insight-type{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,241,235,.45)}
+.sla-badge{margin-left:auto;font-family:'DM Mono',monospace;font-size:.56rem;padding:.12rem .4rem;border-radius:.2rem;background:rgba(255,255,255,.06);color:rgba(244,241,235,.4)}
+.sla-badge.urgent{background:rgba(232,84,84,.15);color:var(--red)}
+.card-summary{font-size:.72rem;line-height:1.45;color:rgba(244,241,235,.75);margin-bottom:.5rem}
+.conf-wrap{display:flex;align-items:center;gap:.5rem}
+.conf-bar{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.conf-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.conf-pct{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--teal);white-space:nowrap}
+.action-flag{display:inline-flex;align-items:center;gap:.25rem;font-family:'DM Mono',monospace;font-size:.56rem;color:var(--gold);margin-top:.35rem}
+.action-flag::before{content:'⚡';font-size:.6rem}
+
+/* THREE-COL ROW */
+.panel-quote{grid-column:1/2}.panel-donut{grid-column:2/3}.panel-bar{grid-column:3/4}
+
+/* QUOTES */
+.quote-list{padding:1rem 1.5rem 1.25rem}
+.quote-item{padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.quote-item:last-child{border-bottom:none}
+.quote-text{font-family:'DM Serif Display',serif;font-style:italic;font-size:.85rem;line-height:1.5;color:var(--paper);margin-bottom:.4rem;position:relative;padding-left:1rem}
+.quote-text::before{content:'"';position:absolute;left:0;top:-.1rem;font-size:1.4rem;color:var(--gold);line-height:1}
+.quote-meta{font-family:'DM Mono',monospace;font-size:.6rem;color:rgba(244,241,235,.35);padding-left:1rem}
+
+/* CHARTS */
+.chart-area{padding:1.25rem 1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
+.donut-wrap{position:relative;width:160px;height:160px}
+.donut{width:160px;height:160px;border-radius:50%;background:conic-gradient(var(--red) 0deg 120deg,var(--orange) 120deg 192deg,var(--yellow) 192deg 228deg,var(--green) 228deg 360deg);animation:spin-in 1.2s cubic-bezier(.22,1,.36,1) both}
+.donut-hole{position:absolute;inset:28px;background:var(--ink-2);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-center-val{font-family:'DM Serif Display',serif;font-size:1.8rem}
+.donut-center-label{font-family:'DM Mono',monospace;font-size:.55rem;color:rgba(244,241,235,.4);letter-spacing:.1em;text-transform:uppercase}
+.donut-legend{display:grid;grid-template-columns:1fr 1fr;gap:.45rem 1rem;width:100%}
+.legend-item{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:rgba(244,241,235,.65)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-count{margin-left:auto;font-family:'DM Mono',monospace;font-size:.65rem;color:rgba(244,241,235,.4)}
+.bar-chart{width:100%;display:flex;flex-direction:column;gap:.7rem}
+.bar-row{display:flex;align-items:center;gap:.6rem}
+.bar-label{font-size:.65rem;color:rgba(244,241,235,.55);width:68px;flex-shrink:0;text-align:right;font-family:'DM Mono',monospace}
+.bar-track{flex:1;height:22px;border-radius:3px;background:rgba(255,255,255,.05);overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:.5rem;font-family:'DM Mono',monospace;font-size:.6rem;color:rgba(10,14,26,.8);font-weight:500;transition:width 1.4s cubic-bezier(.22,1,.36,1)}
+.b1{background:linear-gradient(90deg,var(--red),#f07070);width:97%}.b2{background:linear-gradient(90deg,#e85454,#ff8888);width:93%}
+.b3{background:linear-gradient(90deg,var(--orange),#ffaa66);width:96%}.b4{background:linear-gradient(90deg,var(--orange),#ffbb88);width:98%}
+.b5{background:linear-gradient(90deg,var(--teal),#55ddcc);width:91%}.b6{background:linear-gradient(90deg,var(--green),#77eebb);width:99%}
+
+/* RISK TABLE */
+.panel-risk{grid-column:1/-1}
+.risk-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;padding:.9rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.04);align-items:center;transition:background .15s}
+.risk-row:hover{background:rgba(255,255,255,.025)}.risk-row.hdr{padding:.65rem 1.5rem;background:rgba(255,255,255,.03)}
+.hdr-cell{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,241,235,.3)}
+.acct-cell{display:flex;align-items:center;gap:.6rem}
+.acct-init{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:.85rem;color:var(--ink);flex-shrink:0}
+.acct-name{font-size:.8rem;font-weight:500}.acct-csm{font-size:.65rem;color:rgba(244,241,235,.4);margin-top:.1rem}
+.r-cell{font-size:.75rem;color:rgba(244,241,235,.7);font-family:'DM Mono',monospace}
+.score-wrap{display:flex;align-items:center;gap:.4rem}
+.score-bar{width:48px;height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.score-fill{height:100%;border-radius:2px}
+.rbadge{display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:.62rem;padding:.2rem .45rem;border-radius:.2rem}
+.rbadge.risk{background:rgba(232,84,84,.15);color:var(--red)}.rbadge.watch{background:rgba(240,124,58,.15);color:var(--orange)}.rbadge.ok{background:rgba(61,190,138,.12);color:var(--green)}
+
+/* CLOSED-LOOP CONFIRMATIONS */
+.panel-confirmations{grid-column:1/-1}
+.confirms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;padding:1.25rem 1.5rem}
+.confirm-card{background:var(--ink-3);border-radius:var(--r);padding:.85rem 1rem;border:1px solid rgba(61,190,138,.15);display:flex;gap:.75rem;align-items:flex-start}
+.confirm-check{font-size:1rem;flex-shrink:0;margin-top:.05rem}
+.confirm-title{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:.2rem}
+.confirm-id{font-family:'DM Mono',monospace;font-size:.58rem;color:rgba(244,241,235,.3);margin-bottom:.3rem}
+.confirm-text{font-size:.7rem;color:rgba(244,241,235,.7);line-height:1.4}
+.confirm-sla{font-family:'DM Mono',monospace;font-size:.6rem;color:rgba(244,241,235,.35);margin-top:.3rem;display:flex;align-items:center;gap:.3rem}
+.confirm-sla-val{color:var(--teal)}
+
+/* PIPELINE FLOW */
+.panel-pipeline{grid-column:1/-1}
+.pipeline-flow{display:flex;align-items:center;padding:1.25rem 1.5rem}
+.flow-step{display:flex;flex-direction:column;align-items:center;flex:1;text-align:center}
+.flow-node{width:48px;height:48px;border-radius:50%;background:var(--ink-3);border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.5rem;z-index:1;position:relative}
+.flow-step.complete .flow-node{border-color:var(--green);background:rgba(61,190,138,.1)}
+.flow-step.active .flow-node{border-color:var(--teal);animation:node-pulse 2s ease-in-out infinite}
+.flow-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,241,235,.4)}
+.flow-step.complete .flow-label{color:var(--green)}.flow-step.active .flow-label{color:var(--teal)}
+.flow-sub{font-size:.6rem;color:rgba(244,241,235,.25);margin-top:.15rem;font-family:'DM Mono',monospace}
+.flow-step.active .flow-sub{color:rgba(0,196,180,.6)}
+.flow-connector{flex:.5;height:2px;margin-bottom:2.2rem;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(0,196,180,.3));position:relative}
+.flow-connector.done{background:linear-gradient(90deg,var(--green),var(--teal))}
+.flow-connector::after{content:'▶';position:absolute;right:-4px;top:-7px;font-size:.55rem;color:rgba(0,196,180,.5)}
+.flow-connector.done::after{color:var(--green)}
+
+/* FOOTER */
+footer{position:relative;z-index:1;padding:1rem 3rem;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between}
+.footer-left{font-family:'DM Mono',monospace;font-size:.62rem;color:rgba(244,241,235,.25)}
+.footer-right{display:flex;align-items:center;gap:1.5rem;font-family:'DM Mono',monospace;font-size:.62rem;color:rgba(244,241,235,.25)}
+.footer-right a{color:rgba(201,168,76,.6);text-decoration:none;transition:color .2s}.footer-right a:hover{color:var(--gold)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(10,14,26,.88);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:2rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--ink-2);border:1px solid rgba(255,255,255,.1);border-radius:var(--r2);width:100%;max-width:620px;animation:modal-in .25s ease both;overflow:hidden;max-height:90vh;overflow-y:auto}
+.modal-urgency-bar{height:3px;width:100%}
+.modal-head{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--ink-2);z-index:1}
+.modal-type{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,241,235,.4);margin-bottom:.3rem}
+.modal-title{font-family:'DM Serif Display',serif;font-size:1.2rem}
+.modal-close{background:none;border:none;cursor:pointer;color:rgba(244,241,235,.4);font-size:1.2rem;padding:.1rem;transition:color .2s;line-height:1;flex-shrink:0}
+.modal-close:hover{color:var(--paper)}
+.modal-body{padding:1.25rem 1.5rem}
+.modal-quote{font-family:'DM Serif Display',serif;font-style:italic;font-size:.92rem;line-height:1.55;border-left:3px solid var(--gold);padding-left:1rem;margin-bottom:1.25rem}
+.modal-fields{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+.modal-field{}.modal-field.full{grid-column:1/-1}
+.mf-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,241,235,.35);margin-bottom:.25rem}
+.mf-val{font-size:.78rem;color:rgba(244,241,235,.8);line-height:1.45}
+.mf-val.tag{display:inline-flex;font-family:'DM Mono',monospace;font-size:.68rem;padding:.2rem .55rem;border-radius:.25rem;background:rgba(255,255,255,.06)}
+.s-critical{color:var(--red)}.s-negative{color:var(--orange)}.s-neutral{color:rgba(244,241,235,.6)}.s-positive{color:var(--green)}
+.modal-action{background:rgba(0,196,180,.08);border:1px solid rgba(0,196,180,.22);border-radius:var(--r);padding:.85rem 1rem}
+.ma-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;color:var(--teal);text-transform:uppercase;margin-bottom:.3rem}
+.ma-text{font-size:.78rem;color:rgba(244,241,235,.8);line-height:1.5}
+.modal-footer{padding:.9rem 1.5rem;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.02)}
+.modal-id{font-family:'DM Mono',monospace;font-size:.62rem;color:rgba(244,241,235,.25)}
+.modal-id-note{font-family:'DM Mono',monospace;font-size:.55rem;color:rgba(244,241,235,.18);font-style:italic}
+.modal-conf{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--teal)}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="eyebrow">Invoca · JTBD Feedback Loop POC</div>
+    <h1>Insight <em>Intelligence</em> Dashboard</h1>
+    <div class="header-meta">ACCOUNT: Acme Financial Services &nbsp;·&nbsp; CALL DATE: March 12, 2025 &nbsp;·&nbsp; CSM: Jordan Rivera &nbsp;·&nbsp; ARR: $84,000 &nbsp;·&nbsp; ID: TXN-2025-0312-ACM</div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><span class="live-dot"></span>PIPELINE COMPLETE</div>
+    <div class="account-tag">6 insights extracted · Auto-routing: 6 · Human review: 0</div>
+    <div class="invoca-mark">Erwin M. McDonald</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- KPI ROW — values directly from pipeline output -->
+  <div class="kpi-row">
+    <div class="kpi ar"><div class="kpi-label">Critical Alerts</div><div class="kpi-value red">2 <span>Bug Report + Churn Signal · 4-hr SLA</span></div></div>
+    <div class="kpi ao"><div class="kpi-label">ARR at Risk</div><div class="kpi-value orange">$84K <span>Renewal June 30, 2025</span></div></div>
+    <div class="kpi at"><div class="kpi-label">Insights Extracted</div><div class="kpi-value teal">6 <span>Auto-routing: 6 · Human review: 0</span></div></div>
+    <div class="kpi ag"><div class="kpi-label">Avg. Confidence</div><div class="kpi-value gold">95.7% <span>All above 75% threshold · 0 overrides</span></div></div>
+    <div class="kpi agr"><div class="kpi-label">Positive Signal</div><div class="kpi-value green">+23% <span>Qualified lead rate · VP credited Invoca</span></div></div>
+  </div>
+
+  <!-- ROUTING MAP — exact destination, SLA, confidence from pipeline -->
+  <div class="panel panel-routing">
+    <div class="panel-header"><div class="panel-title">Stakeholder Routing Map</div><div class="panel-badge">All 6 insights routed · 0 to queue</div></div>
+    <div class="routing-grid">
+
+      <div class="routing-lane">
+        <div class="lane-header"><span class="lane-icon">🔧</span><span class="lane-name">Engineering</span><span class="lane-count">1 alert</span></div>
+        <div class="insight-card critical" onclick="openModal('bug')">
+          <div class="card-top"><span class="urgency-pip critical"></span><span class="insight-type">Bug Report</span><span class="sla-badge urgent">4 hrs · CRITICAL</span></div>
+          <div class="card-summary">Call attribution data has been inconsistent for 6 weeks, creating discrepancies between Invoca reporting and Google Ads dashboard. A support ticket has been open for 41 days without resolution, causing the paid search team to distrust attribution numbers.</div>
+          <div class="conf-wrap"><div class="conf-bar"><div class="conf-fill" style="width:97%"></div></div><span class="conf-pct">97%</span></div>
+          <div class="action-flag">P1 Escalation Required</div>
+        </div>
+      </div>
+
+      <div class="routing-lane">
+        <div class="lane-header"><span class="lane-icon">🤝</span><span class="lane-name">CS Leadership</span><span class="lane-count">1 alert</span></div>
+        <div class="insight-card critical" onclick="openModal('churn')">
+          <div class="card-top"><span class="urgency-pip critical"></span><span class="insight-type">Churn Signal</span><span class="sla-badge urgent">4 hrs · CRITICAL</span></div>
+          <div class="card-summary">Customer stated that if the attribution bug is not fixed and pricing is not addressed before June renewal, she does not know what the board will say — implying renewal is at risk.</div>
+          <div class="conf-wrap"><div class="conf-bar"><div class="conf-fill" style="width:93%"></div></div><span class="conf-pct">93%</span></div>
+          <div class="action-flag">Renewal Risk — Flag Immediately</div>
+        </div>
+      </div>
+
+      <div class="routing-lane">
+        <div class="lane-header"><span class="lane-icon">💼</span><span class="lane-name">Sales Leadership</span><span class="lane-count">2 alerts</span></div>
+        <div class="insight-card high" onclick="openModal('competitor')">
+          <div class="card-top"><span class="urgency-pip high"></span><span class="insight-type">Competitor Mention</span><span class="sla-badge">48 hrs · HIGH</span></div>
+          <div class="card-summary">Acme Financial had a demo with Marchex last month. Marchex pitched 'omnichannel conversation intelligence.' Customer's leadership is asking questions about alternatives. Customer stated they are not leaving but are being asked to evaluate.</div>
+          <div class="conf-wrap"><div class="conf-bar"><div class="conf-fill" style="width:96%"></div></div><span class="conf-pct">96%</span></div>
+          <div class="action-flag">Battlecard · Competitor: Marchex</div>
+        </div>
+        <div class="insight-card high" onclick="openModal('pricing')">
+          <div class="card-top"><span class="urgency-pip high"></span><span class="insight-type">Pricing Friction</span><span class="sla-badge">48 hrs · HIGH</span></div>
+          <div class="card-summary">Customer received an 18% renewal price increase while their own marketing budget was cut 15% this quarter. Customer stated they cannot get the increase through finance and will need pricing options before June renewal.</div>
+          <div class="conf-wrap"><div class="conf-bar"><div class="conf-fill" style="width:98%"></div></div><span class="conf-pct">98%</span></div>
+          <div class="action-flag">Pricing Options Needed Before June</div>
+        </div>
+      </div>
+
+      <div class="routing-lane">
+        <div class="lane-header"><span class="lane-icon">📋</span><span class="lane-name">Product Management</span><span class="lane-count">2 alerts</span></div>
+        <div class="insight-card medium" onclick="openModal('feature')">
+          <div class="card-top"><span class="urgency-pip medium"></span><span class="insight-type">Feature Request</span><span class="sla-badge">1 week · MEDIUM</span></div>
+          <div class="card-summary">Customer is expanding into SMS and chat channels and wants unified omnichannel conversation intelligence — the same intent scoring and attribution Invoca provides for calls, extended across all customer interaction channels.</div>
+          <div class="conf-wrap"><div class="conf-bar"><div class="conf-fill" style="width:91%"></div></div><span class="conf-pct">91%</span></div>
+        </div>
+        <div class="insight-card low" onclick="openModal('positive')">
+          <div class="card-top"><span class="urgency-pip low"></span><span class="insight-type">Positive Signal</span><span class="sla-badge">1 week · LOW</span></div>
+          <div class="card-summary">Inside sales team attributes a 23% improvement in qualified lead rate this quarter to Invoca call scoring. Customer VP explicitly credited the platform and described the outcome as 'huge.'</div>
+          <div class="conf-wrap"><div class="conf-bar"><div class="conf-fill" style="width:99%"></div></div><span class="conf-pct">99%</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VERBATIM EVIDENCE — exact quotes from pipeline, attribution corrected (no "Sarah") -->
+  <div class="panel panel-quote">
+    <div class="panel-header"><div class="panel-title">Verbatim Evidence</div><div class="panel-badge">Exact from transcript</div></div>
+    <div class="quote-list">
+      <div class="quote-item">
+        <div class="quote-text">We've flagged it twice to support and the ticket is still open. It's not a minor thing — we're making media spend decisions based on this data.</div>
+        <div class="quote-meta">Acme Financial Services · Bug Report · 97% confidence</div>
+      </div>
+      <div class="quote-item">
+        <div class="quote-text">The bug needs to get fixed and the pricing conversation needs to happen before June. Otherwise honestly I don't know what the board is going to say.</div>
+        <div class="quote-meta">Acme Financial Services · Churn Signal · 93% confidence</div>
+      </div>
+      <div class="quote-item">
+        <div class="quote-text">We're not going anywhere, but I want to be transparent that we're being asked to evaluate alternatives.</div>
+        <div class="quote-meta">Acme Financial Services · Competitor Mention · 96% confidence</div>
+      </div>
+      <div class="quote-item">
+        <div class="quote-text">Our inside sales team actually credits Invoca with a 23% improvement in qualified lead rate this quarter, which is huge.</div>
+        <div class="quote-meta">Acme Financial Services · Positive Signal · 99% confidence</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONUT CHART -->
+  <div class="panel panel-donut">
+    <div class="panel-header"><div class="panel-title">Insight Distribution</div><div class="panel-badge">This call · 6 total</div></div>
+    <div class="chart-area">
+      <div class="donut-wrap">
+        <div class="donut"></div>
+        <div class="donut-hole"><span class="donut-center-val">6</span><span class="donut-center-label">Insights</span></div>
+      </div>
+      <div class="donut-legend">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Critical<span class="legend-count">2</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>High<span class="legend-count">2</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--yellow)"></span>Medium<span class="legend-count">1</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Low<span class="legend-count">1</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIDENCE BAR CHART — exact scores from pipeline -->
+  <div class="panel panel-bar">
+    <div class="panel-header"><div class="panel-title">Confidence by Insight</div><div class="panel-badge">All ≥ 75% threshold</div></div>
+    <div class="chart-area">
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-label">Bug Report</span><div class="bar-track"><div class="bar-fill b1">97%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Churn Signal</span><div class="bar-track"><div class="bar-fill b2">93%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Competitor</span><div class="bar-track"><div class="bar-fill b3">96%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Pricing</span><div class="bar-track"><div class="bar-fill b4">98%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Feature Req.</span><div class="bar-track"><div class="bar-fill b5">91%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Positive</span><div class="bar-track"><div class="bar-fill b6">99%</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT RISK REGISTER -->
+  <div class="panel panel-risk">
+    <div class="panel-header"><div class="panel-title">Account Risk Register</div><div class="panel-badge">Simulated portfolio · 5 accounts</div></div>
+    <div class="risk-row hdr">
+      <div class="hdr-cell">Account</div><div class="hdr-cell">ARR</div><div class="hdr-cell">Renewal</div><div class="hdr-cell">Risk Score</div><div class="hdr-cell">Status</div><div class="hdr-cell">Open Signals</div>
+    </div>
+    <div class="risk-row">
+      <div class="acct-cell"><div class="acct-init" style="background:linear-gradient(135deg,var(--teal),var(--blue))">A</div><div><div class="acct-name">Acme Financial Services</div><div class="acct-csm">CSM: Jordan Rivera</div></div></div>
+      <div class="r-cell">$84,000</div><div class="r-cell">Jun 30, 2025</div>
+      <div class="r-cell"><div class="score-wrap"><div class="score-bar"><div class="score-fill" style="background:var(--red);width:85%"></div></div><span style="font-size:.65rem;color:var(--red)">85</span></div></div>
+      <div class="r-cell"><span class="rbadge risk">⚠ At Risk</span></div><div class="r-cell" style="color:var(--red)">6 · 2 CRITICAL</div>
+    </div>
+    <div class="risk-row">
+      <div class="acct-cell"><div class="acct-init" style="background:linear-gradient(135deg,var(--orange),var(--gold))">M</div><div><div class="acct-name">Meridian Healthcare</div><div class="acct-csm">CSM: Taylor Chen</div></div></div>
+      <div class="r-cell">$126,000</div><div class="r-cell">Sep 15, 2025</div>
+      <div class="r-cell"><div class="score-wrap"><div class="score-bar"><div class="score-fill" style="background:var(--orange);width:55%"></div></div><span style="font-size:.65rem;color:var(--orange)">52</span></div></div>
+      <div class="r-cell"><span class="rbadge watch">◎ Watch</span></div><div class="r-cell" style="color:var(--orange)">3 · 1 HIGH</div>
+    </div>
+    <div class="risk-row">
+      <div class="acct-cell"><div class="acct-init" style="background:linear-gradient(135deg,var(--green),var(--teal))">P</div><div><div class="acct-name">Peak Auto Group</div><div class="acct-csm">CSM: Marcus Webb</div></div></div>
+      <div class="r-cell">$212,000</div><div class="r-cell">Dec 1, 2025</div>
+      <div class="r-cell"><div class="score-wrap"><div class="score-bar"><div class="score-fill" style="background:var(--green);width:25%"></div></div><span style="font-size:.65rem;color:var(--green)">22</span></div></div>
+      <div class="r-cell"><span class="rbadge ok">✓ Healthy</span></div><div class="r-cell" style="color:var(--green)">1 · Positive</div>
+    </div>
+    <div class="risk-row">
+      <div class="acct-cell"><div class="acct-init" style="background:linear-gradient(135deg,var(--purple),var(--blue))">V</div><div><div class="acct-name">Vantage Retail Corp</div><div class="acct-csm">CSM: Jordan Rivera</div></div></div>
+      <div class="r-cell">$68,000</div><div class="r-cell">Mar 31, 2025</div>
+      <div class="r-cell"><div class="score-wrap"><div class="score-bar"><div class="score-fill" style="background:var(--orange);width:70%"></div></div><span style="font-size:.65rem;color:var(--orange)">68</span></div></div>
+      <div class="r-cell"><span class="rbadge watch">◎ Watch</span></div><div class="r-cell" style="color:var(--orange)">2 · Feature Gap</div>
+    </div>
+    <div class="risk-row">
+      <div class="acct-cell"><div class="acct-init" style="background:linear-gradient(135deg,var(--teal),var(--green))">S</div><div><div class="acct-name">Suncoast Insurance</div><div class="acct-csm">CSM: Taylor Chen</div></div></div>
+      <div class="r-cell">$94,000</div><div class="r-cell">Jul 15, 2025</div>
+      <div class="r-cell"><div class="score-wrap"><div class="score-bar"><div class="score-fill" style="background:var(--green);width:18%"></div></div><span style="font-size:.65rem;color:var(--green)">18</span></div></div>
+      <div class="r-cell"><span class="rbadge ok">✓ Healthy</span></div><div class="r-cell" style="color:var(--green)">2 · All Positive</div>
+    </div>
+  </div>
+
+  <!-- CSM CLOSED-LOOP CONFIRMATIONS — mirrors terminal section exactly -->
+  <div class="panel panel-confirmations">
+    <div class="panel-header"><div class="panel-title">CSM Closed-Loop Confirmations</div><div class="panel-badge">6 / 6 confirmed · Pipeline complete</div></div>
+    <div class="confirms-grid">
+      <div class="confirm-card">
+        <div class="confirm-check">✅</div>
+        <div>
+          <div class="confirm-title">Insight Confirmed</div>
+          <div class="confirm-id">JTBD-20260227-ADD8E43F · Bug Report</div>
+          <div class="confirm-text">Your bug report from Acme Financial Services has been routed to Engineering.</div>
+          <div class="confirm-sla">Response SLA: <span class="confirm-sla-val">4 hours</span>&nbsp;·&nbsp;Confidence: <span class="confirm-sla-val">97%</span></div>
+        </div>
+      </div>
+      <div class="confirm-card">
+        <div class="confirm-check">✅</div>
+        <div>
+          <div class="confirm-title">Insight Confirmed</div>
+          <div class="confirm-id">JTBD-20260227-15CF8965 · Churn Signal</div>
+          <div class="confirm-text">Your churn signal from Acme Financial Services has been routed to Customer Success Leadership.</div>
+          <div class="confirm-sla">Response SLA: <span class="confirm-sla-val">4 hours</span>&nbsp;·&nbsp;Confidence: <span class="confirm-sla-val">93%</span></div>
+        </div>
+      </div>
+      <div class="confirm-card">
+        <div class="confirm-check">✅</div>
+        <div>
+          <div class="confirm-title">Insight Confirmed</div>
+          <div class="confirm-id">JTBD-20260227-FB0AFF20 · Competitor Mention</div>
+          <div class="confirm-text">Your competitor mention from Acme Financial Services has been routed to Sales Leadership.</div>
+          <div class="confirm-sla">Response SLA: <span class="confirm-sla-val">48 hours</span>&nbsp;·&nbsp;Confidence: <span class="confirm-sla-val">96%</span></div>
+        </div>
+      </div>
+      <div class="confirm-card">
+        <div class="confirm-check">✅</div>
+        <div>
+          <div class="confirm-title">Insight Confirmed</div>
+          <div class="confirm-id">JTBD-20260227-241840B7 · Pricing Friction</div>
+          <div class="confirm-text">Your pricing friction from Acme Financial Services has been routed to Sales Leadership.</div>
+          <div class="confirm-sla">Response SLA: <span class="confirm-sla-val">48 hours</span>&nbsp;·&nbsp;Confidence: <span class="confirm-sla-val">98%</span></div>
+        </div>
+      </div>
+      <div class="confirm-card">
+        <div class="confirm-check">✅</div>
+        <div>
+          <div class="confirm-title">Insight Confirmed</div>
+          <div class="confirm-id">JTBD-20260227-62EF015C · Feature Request</div>
+          <div class="confirm-text">Your feature request from Acme Financial Services has been routed to Product Management.</div>
+          <div class="confirm-sla">Response SLA: <span class="confirm-sla-val">1 week</span>&nbsp;·&nbsp;Confidence: <span class="confirm-sla-val">91%</span></div>
+        </div>
+      </div>
+      <div class="confirm-card">
+        <div class="confirm-check">✅</div>
+        <div>
+          <div class="confirm-title">Insight Confirmed</div>
+          <div class="confirm-id">JTBD-20260227-5236848F · Positive Signal</div>
+          <div class="confirm-text">Your positive signal from Acme Financial Services has been routed to Product Management.</div>
+          <div class="confirm-sla">Response SLA: <span class="confirm-sla-val">1 week</span>&nbsp;·&nbsp;Confidence: <span class="confirm-sla-val">99%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIPELINE ARCHITECTURE -->
+  <div class="panel panel-pipeline">
+    <div class="panel-header"><div class="panel-title">Pipeline Architecture — How This Works</div><div class="panel-badge">JTBD Feedback Loop v1.0</div></div>
+    <div class="pipeline-flow">
+      <div class="flow-step complete"><div class="flow-node">📞</div><div class="flow-label">Ingest</div><div class="flow-sub">Transcript loaded</div></div>
+      <div class="flow-connector done"></div>
+      <div class="flow-step complete"><div class="flow-node">🤖</div><div class="flow-label">Extract</div><div class="flow-sub">Claude API · 3-layer prompt</div></div>
+      <div class="flow-connector done"></div>
+      <div class="flow-step complete"><div class="flow-node">🎯</div><div class="flow-label">Score</div><div class="flow-sub">Confidence 0.0–1.0</div></div>
+      <div class="flow-connector done"></div>
+      <div class="flow-step complete"><div class="flow-node">🔀</div><div class="flow-label">Gate</div><div class="flow-sub">≥75% auto-route</div></div>
+      <div class="flow-connector done"></div>
+      <div class="flow-step complete"><div class="flow-node">🚦</div><div class="flow-label">Route</div><div class="flow-sub">4 teams · SLA assigned</div></div>
+      <div class="flow-connector done"></div>
+      <div class="flow-step complete"><div class="flow-node">📋</div><div class="flow-label">Alert</div><div class="flow-sub">Structured + verbatim</div></div>
+      <div class="flow-connector done"></div>
+      <div class="flow-step active"><div class="flow-node">✅</div><div class="flow-label">Confirm</div><div class="flow-sub">CSM loop closed · 6/6</div></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-left">JTBD Feedback Loop Architect · Invoca Applied AI Analyst POC · Option 3 · Erwin M. McDonald</div>
+  <div class="footer-right">
+    <span>Pipeline: claude-sonnet-4-6</span>
+    <span>Prompt v1.0.0</span>
+    <span>Alert IDs shown from sample run · Format: JTBD-YYYYMMDD-XXXXXXXX</span>
+    <a href="https://github.com/emcdo411/jtbd-feedback-loop" target="_blank">github.com/emcdo411/jtbd-feedback-loop</a>
+  </div>
+</footer>
+
+<!-- MODAL — surfaces all JSON schema fields: summary, verbatim, bug_description/feature_requested/competitor_named, sentiment, destination, SLA, urgency, suggested_action -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div id="modal-urgency-bar" class="modal-urgency-bar"></div>
+    <div class="modal-head">
+      <div>
+        <div class="modal-type" id="modal-type"></div>
+        <div class="modal-title" id="modal-title"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-quote" id="modal-quote"></div>
+      <div class="modal-fields">
+        <div class="modal-field full"><div class="mf-label">Summary</div><div class="mf-val" id="modal-summary"></div></div>
+        <div class="modal-field full" id="modal-extra-wrap" style="display:none"><div class="mf-label" id="modal-extra-label"></div><div class="mf-val" id="modal-extra-val"></div></div>
+        <div class="modal-field"><div class="mf-label">Sentiment</div><div class="mf-val tag" id="modal-sentiment"></div></div>
+        <div class="modal-field"><div class="mf-label">Urgency</div><div class="mf-val" id="modal-urgency"></div></div>
+        <div class="modal-field"><div class="mf-label">Destination · SLA</div><div class="mf-val" id="modal-dest"></div></div>
+        <div class="modal-field"><div class="mf-label">Account · CSM</div><div class="mf-val">Acme Financial Services · Jordan Rivera</div></div>
+        <div class="modal-field"><div class="mf-label">ARR · Renewal</div><div class="mf-val">$84,000 · June 30, 2025</div></div>
+        <div class="modal-field"><div class="mf-label">Call Date · ID</div><div class="mf-val">March 12, 2025 · TXN-2025-0312-ACM</div></div>
+      </div>
+      <div class="modal-action"><div class="ma-label">⚡ Suggested Action</div><div class="ma-text" id="modal-action"></div></div>
+    </div>
+    <div class="modal-footer">
+      <div><div class="modal-id" id="modal-id"></div><div class="modal-id-note">Alert IDs regenerate each pipeline run (JTBD-YYYYMMDD-XXXXXXXX)</div></div>
+      <span class="modal-conf" id="modal-conf"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+// DATA — exact values from pipeline JSON output. Nothing fabricated.
+const D = {
+  bug:{
+    color:'#e85454', urgency:'🔴 CRITICAL',
+    type:'🔧 Engineering · Bug Report',
+    title:'41-Day Attribution Bug',
+    quote:"We've flagged it twice to support and the ticket is still open. It's not a minor thing — we're making media spend decisions based on this data.",
+    summary:"Call attribution data has been inconsistent for 6 weeks, creating discrepancies between Invoca reporting and Google Ads dashboard. A support ticket has been open for 41 days without resolution, causing the paid search team to distrust attribution numbers.",
+    extraLabel:'Bug Description',
+    extraVal:"Call attribution data discrepancy between Invoca and Google Ads dashboard — 41-day open support ticket, paid search team has lost confidence in attribution numbers",
+    sentiment:'critical', sentClass:'s-critical',
+    dest:'🔧 Engineering · SLA: 4 hours (CRITICAL override)',
+    action:"Escalate to Engineering as P1. Assign owner and provide ETA by end of week. CSM to confirm escalation to customer within 24 hours.",
+    id:'JTBD-20260227-ADD8E43F', conf:'Confidence: 97%'
+  },
+  churn:{
+    color:'#e85454', urgency:'🔴 CRITICAL',
+    type:'🤝 Customer Success Leadership · Churn Signal',
+    title:'Renewal Risk — June Deadline',
+    quote:"The bug needs to get fixed and the pricing conversation needs to happen before June. Otherwise honestly I don't know what the board is going to say.",
+    summary:"Customer stated that if the attribution bug is not fixed and pricing is not addressed before June renewal, she does not know what the board will say — implying renewal is at risk.",
+    extraLabel:null, extraVal:null,
+    sentiment:'critical', sentClass:'s-critical',
+    dest:'🤝 CS Leadership · SLA: 4 hours (CRITICAL override)',
+    action:"Flag account as renewal risk. Escalate to CS leadership and Sales VP. Two hard dependencies: (1) attribution bug resolved, (2) pricing options delivered before June renewal conversation.",
+    id:'JTBD-20260227-15CF8965', conf:'Confidence: 93%'
+  },
+  competitor:{
+    color:'#f07c3a', urgency:'🟠 HIGH',
+    type:'💼 Sales Leadership · Competitor Mention',
+    title:'Marchex Demo — Omnichannel Pitch',
+    quote:"We had a demo with Marchex last month. They were pitching something they called 'omnichannel conversation intelligence.' We're not going anywhere, but I want to be transparent that we're being asked to evaluate alternatives.",
+    summary:"Acme Financial had a demo with Marchex last month. Marchex pitched 'omnichannel conversation intelligence.' Customer's leadership is asking questions about alternatives. Customer stated they are not leaving but are being asked to evaluate.",
+    extraLabel:'Competitor Named', extraVal:'Marchex',
+    sentiment:'negative', sentClass:'s-negative',
+    dest:'💼 Sales Leadership · SLA: 48 hours',
+    action:"Alert Sales Leadership immediately. Prepare competitive battlecard for Marchex omnichannel claim. Ensure renewal conversation addresses this directly.",
+    id:'JTBD-20260227-FB0AFF20', conf:'Confidence: 96%'
+  },
+  pricing:{
+    color:'#f07c3a', urgency:'🟠 HIGH',
+    type:'💼 Sales Leadership · Pricing Friction',
+    title:'18% Increase vs. 15% Budget Cut',
+    quote:"The price increase is 18%. I understand costs go up but our marketing budget got cut 15% this quarter. I'm going to have a hard time getting this through finance at that number.",
+    summary:"Customer received an 18% renewal price increase while their own marketing budget was cut 15% this quarter. Customer stated they cannot get the increase through finance and will need pricing options before June renewal.",
+    extraLabel:null, extraVal:null,
+    sentiment:'negative', sentClass:'s-negative',
+    dest:'💼 Sales Leadership · SLA: 48 hours',
+    action:"Escalate to Sales Leadership before formal renewal discussions. CSM to request pricing options from leadership within 1 week. Renewal at risk if not addressed.",
+    id:'JTBD-20260227-241840B7', conf:'Confidence: 98%'
+  },
+  feature:{
+    color:'#f5c842', urgency:'🟡 MEDIUM',
+    type:'📋 Product Management · Feature Request',
+    title:'Unified Omnichannel Intelligence',
+    quote:"It would be really valuable if there was some kind of unified view — like, the same kind of intent scoring and attribution you do for calls but across all the channels where customers are reaching us.",
+    summary:"Customer is expanding into SMS and chat channels and wants unified omnichannel conversation intelligence — the same intent scoring and attribution Invoca provides for calls, extended across all customer interaction channels.",
+    extraLabel:'Feature Requested',
+    extraVal:"Unified omnichannel conversation intelligence — intent scoring and attribution across calls, SMS, and chat channels",
+    sentiment:'neutral', sentClass:'s-neutral',
+    dest:'📋 Product Management · SLA: 1 week',
+    action:"Route to Product Management for roadmap consideration. Document as strategic gap — customer has confirmed Marchex is pitching this capability.",
+    id:'JTBD-20260227-62EF015C', conf:'Confidence: 91%'
+  },
+  positive:{
+    color:'#3dbe8a', urgency:'🟢 LOW',
+    type:'📋 Product Management · Positive Signal',
+    title:'+23% Qualified Lead Rate',
+    quote:"Our inside sales team actually credits Invoca with a 23% improvement in qualified lead rate this quarter, which is huge.",
+    summary:"Inside sales team attributes a 23% improvement in qualified lead rate this quarter to Invoca call scoring. Customer VP explicitly credited the platform and described the outcome as 'huge.'",
+    extraLabel:null, extraVal:null,
+    sentiment:'positive', sentClass:'s-positive',
+    dest:'📋 Product Management · SLA: 1 week',
+    action:"Capture as customer success story. Use in renewal conversation to anchor value. Share with Marketing for case study consideration.",
+    id:'JTBD-20260227-5236848F', conf:'Confidence: 99%'
+  }
+};
+
+function openModal(k) {
+  const d = D[k];
+  document.getElementById('modal-urgency-bar').style.background = d.color;
+  document.getElementById('modal-type').textContent    = d.type;
+  document.getElementById('modal-title').textContent   = d.title;
+  document.getElementById('modal-quote').textContent   = d.quote;
+  document.getElementById('modal-summary').textContent = d.summary;
+  document.getElementById('modal-urgency').textContent = d.urgency;
+  document.getElementById('modal-dest').textContent    = d.dest;
+  document.getElementById('modal-action').textContent  = d.action;
+  document.getElementById('modal-id').textContent      = 'Sample Alert ID: ' + d.id;
+  document.getElementById('modal-conf').textContent    = d.conf;
+  const sent = document.getElementById('modal-sentiment');
+  sent.textContent = d.sentiment;
+  sent.className = 'mf-val tag ' + d.sentClass;
+  const wrap = document.getElementById('modal-extra-wrap');
+  if (d.extraLabel) {
+    document.getElementById('modal-extra-label').textContent = d.extraLabel;
+    document.getElementById('modal-extra-val').textContent   = d.extraVal;
+    wrap.style.display = '';
+  } else { wrap.style.display = 'none'; }
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+window.addEventListener('load', () => {
+  document.querySelectorAll('.conf-fill,.bar-fill').forEach(el => {
+    const w = el.style.width; el.style.width='0';
+    setTimeout(() => { el.style.width = w; }, 400);
+  });
+});
+</script>
+</body>
+</html>
