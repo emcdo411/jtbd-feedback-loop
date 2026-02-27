@@ -1424,8 +1424,14 @@ def main():
                         help="Run in mock mode without API key")
 
     args = parser.parse_args()
+
+    # Resolve transcript path relative to main.py's directory if no path separator given
+    transcript_path = args.transcript
+    if not os.path.isabs(transcript_path) and not os.sep in transcript_path and not '/' in transcript_path:
+        transcript_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), transcript_path)
+
     run_pipeline(
-        transcript_path=args.transcript,
+        transcript_path=transcript_path,
         output_format=args.output,
         mock=args.mock
     )
@@ -1895,10 +1901,13 @@ Write-Host "  Your JTBD Feedback Loop repo is live on GitHub." -ForegroundColor 
 Write-Host ""
 Write-Host "  NEXT STEPS:" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  1. Test the POC (demo mode — no API key needed):" -ForegroundColor White
+Write-Host "  1. Navigate into poc/ and run the POC:" -ForegroundColor White
 Write-Host "     cd $RepoName\poc" -ForegroundColor Gray
 Write-Host "     pip install anthropic" -ForegroundColor Gray
 Write-Host "     python main.py --mock" -ForegroundColor Gray
+Write-Host ""
+Write-Host "  ⚠️  IMPORTANT: Always run from inside poc\\" -ForegroundColor DarkYellow
+Write-Host "     main.py needs sample_transcript.txt in the same folder." -ForegroundColor DarkYellow
 Write-Host ""
 Write-Host "  2. Test with a live API key:" -ForegroundColor White
 Write-Host "     `$env:ANTHROPIC_API_KEY = 'your_key_here'" -ForegroundColor Gray
