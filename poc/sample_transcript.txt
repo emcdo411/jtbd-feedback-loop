@@ -1,0 +1,47 @@
+TRANSCRIPT ID: TXN-2025-0312-ACM
+ACCOUNT: Acme Financial Services
+CSM: Jordan Rivera
+CALL DATE: March 12, 2025
+CALL TYPE: Quarterly Business Review
+DURATION: 47 minutes
+ARR: $84,000
+RENEWAL DATE: June 30, 2025
+
+---
+
+Jordan: Hi Sarah, Marcus — thanks for making time today. How's everything going on your end?
+
+Sarah (VP Marketing, Acme): Honestly Jordan, it's been a mixed quarter. We've had some wins but there are a few things I really need to get on the record today because they're starting to affect how we think about our tech stack.
+
+Jordan: Absolutely, that's exactly what this call is for. Walk me through it.
+
+Sarah: Okay so the big one — the call attribution data has been inconsistent for the past six weeks. I'm seeing discrepancies between what Invoca is reporting and what we're seeing in our Google Ads dashboard. We've flagged it twice to support and the ticket is still open. It's not a minor thing — we're making media spend decisions based on this data.
+
+Marcus (Marketing Ops, Acme): Yeah I can give you the ticket number. It's been 41 days. Our paid search team has basically stopped trusting the attribution numbers because they can't reconcile them. They've started doing manual spot-checks which is eating up time we don't have.
+
+Jordan: Marcus, that's not acceptable and I'm going to escalate that personally today. I'm sorry that's been sitting that long.
+
+Sarah: I appreciate that. The other thing — and this is more of a wishlist item — we're doing a big push into SMS and chat channels this summer. We have a ton of call intelligence now from Invoca, but none of that transfers to our chat interactions. It would be really valuable if there was some kind of unified view — like, the same kind of intent scoring and attribution you do for calls but across all the channels where customers are reaching us.
+
+Jordan: That's really interesting. Is that something you've seen competitors doing, or is it more of an internal need you've identified?
+
+Sarah: Honestly, we had a demo with Marchex last month. They were pitching something they called "omnichannel conversation intelligence" — I don't know how mature it actually is, but it got our leadership asking questions. We're not going anywhere, but I want to be transparent that we're being asked to evaluate alternatives.
+
+Marcus: The Marchex thing was mostly a vendor pitch, Sarah. But the omnichannel gap is real regardless of who solves it.
+
+Sarah: Right. And look — we love the platform overall. The call scoring has been incredibly valuable and our inside sales team actually credits Invoca with a 23% improvement in qualified lead rate this quarter, which is huge. So it's not like we're unhappy. It's more that the attribution bug is making people nervous and the omnichannel piece is a real strategic gap for us.
+
+Jordan: I'm glad to hear the call scoring is delivering. That 23% lift is significant — I want to make sure we're capturing that as part of your success story. On the attribution issue, I'm going to create a P1 escalation today and get engineering on it before end of week. On the omnichannel question — I can't make product promises, but I can make sure that feedback gets to the right people.
+
+Sarah: That would be helpful. And Jordan, one more thing — we got our renewal quote last week and the price increase is 18%. I understand costs go up but our marketing budget got cut 15% this quarter. I'm going to have a hard time getting this through finance at that number. I don't want to make this a negotiation on this call, but I wanted you to know it's a real concern before we get to renewal conversations.
+
+Jordan: Sarah, I really appreciate you telling me directly. Let me bring this to my leadership before we get into formal renewal discussions. I want to make sure we come to that conversation with options.
+
+Sarah: Thanks Jordan. Overall we like where this is going, but the bug needs to get fixed and the pricing conversation needs to happen before June. Otherwise honestly I don't know what the board is going to say.
+
+Jordan: Understood. I'll follow up with a written summary of today's call and the escalation ticket by end of day tomorrow. 
+
+Sarah: Perfect. Thanks Jordan.
+
+---
+END OF TRANSCRIPT
