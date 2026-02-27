@@ -74,32 +74,39 @@ A Python pipeline powered by the Anthropic API that turns raw call transcripts i
 ## ⚡ Quick Start
 
 ### Option A — Demo Mode (No API Key Required)
-```bash
+
+> **⚠️ Windows note:** Always `cd` into `poc/` before running Python.
+> `main.py` and `sample_transcript.txt` must be in the same working directory.
+
+```powershell
 # 1. Clone the repo
 git clone https://github.com/emcdo411/jtbd-feedback-loop.git
-cd jtbd-feedback-loop
 
-# 2. Install dependency (just one)
+# 2. Navigate INTO the poc folder — this is critical
+cd jtbd-feedback-loop\poc
+
+# 3. Install the one dependency
 pip install anthropic
 
-# 3. Run with sample transcript — no API key needed
-python poc/main.py --mock
+# 4. Run in demo mode — no API key needed
+python main.py --mock
 
-# 4. JSON output (for integration inspection)
-python poc/main.py --mock --output json
+# 5. JSON output mode
+python main.py --mock --output json
 ```
 
 ### Option B — Live Mode (With Anthropic API Key)
-```bash
-# Set your API key
-export ANTHROPIC_API_KEY=your_key_here          # macOS / Linux
-$env:ANTHROPIC_API_KEY = "your_key_here"        # Windows PowerShell
+```powershell
+# Still inside poc/ ...
+
+# Set your API key (Windows PowerShell)
+$env:ANTHROPIC_API_KEY = "your_key_here"
 
 # Run with the included demo transcript
-python poc/main.py
+python main.py
 
-# Run with your own transcript
-python poc/main.py --transcript path/to/your_transcript.txt
+# Run with your own transcript (use the full path)
+python main.py --transcript C:\path\to\your_transcript.txt
 ```
 
 ---
