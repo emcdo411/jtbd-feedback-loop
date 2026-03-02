@@ -9,11 +9,16 @@
 
 Takes a raw customer call transcript → extracts structured business insights → routes each insight to the correct stakeholder with confidence scoring, urgency classification, and closed-loop CSM confirmation.
 
-**One command. Live output. No dashboard required.**
+**Two delivery modes:**
+
+| Mode | How to Run |
+|------|-----------|
+| **React UI** | Open `jtbd-feedback-loop.jsx` in Claude.ai — paste transcript, hit ▶ RUN |
+| **Python CLI** | `python main.py` or `python main.py --mock` |
 
 ---
 
-## Quick Start
+## Quick Start — CLI
 
 ```bash
 # Install dependency
@@ -37,59 +42,104 @@ python main.py --transcript path/to/your/transcript.txt
 
 ---
 
-## Architecture
+## Quick Start — React UI
+
+The React UI (`jtbd-feedback-loop.jsx`) runs inside Claude.ai and calls the Anthropic API directly. No build step, no API key setup required.
+
+**Features:**
+- Paste any transcript or load the built-in Acme Financial demo
+- Live pipeline status bar: INGEST → EXTRACT → SCORE → ROUTE → ALERT
+- Insight cards sorted by urgency, each with confidence bar, verbatim quote, routing destination, and suggested action
+- Stakeholder routing summary with ⚡ escalation flags for CRITICAL items
+- Stats dashboard: total insights, auto-routed count, human review queue, avg confidence
+
+---
+
+## Pipeline Architecture
 
 ```
-sample_transcript.txt
+TRANSCRIPT IN → INGEST → EXTRACT → SCORE → ROUTE → ALERT → CONFIRM → LOOP CLOSED
+```
+
+### Full Flow
+
+```
+sample_transcript.txt (or UI paste)
         │
         ▼
 ┌───────────────────┐
-│   main.py         │  ← Orchestrator. Loads transcript, calls API,
-│   (pipeline)      │    coordinates all modules.
+│   INGEST          │  ← Load transcript + parse CallMetadata
+│                   │    (CSM name, account, ARR, renewal date, call ID)
 └────────┬──────────┘
          │
          ▼
 ┌───────────────────┐
-│   prompts.py      │  ← Prompt engineering layer.
-│   (extraction)    │    System prompt + extraction prompt + fallback prompt.
+│   EXTRACT         │  ← 3-layer prompt engineering strategy
+│   prompts.py      │    Layer 1: System persona + JSON contract
+│                   │    Layer 2: Context-injected extraction (7 insight types)
+│                   │    Layer 3: Fallback on parse failure
 └────────┬──────────┘
          │
-         ▼ (Anthropic API call)
+         ▼ (Anthropic API — claude-sonnet-4-6)
          │
 ┌───────────────────┐
-│   error_handler.py│  ← Parse JSON → validate schema → handle failures.
-│   (validation)    │    Two-stage fallback. Never hard-crashes.
+│   SCORE           │  ← Parse JSON → validate schema → confidence check
+│   error_handler.py│    2-stage fallback. Never hard-crashes.
 └────────┬──────────┘
          │
          ▼
 ┌───────────────────┐
-│   schema.py       │  ← Typed data contracts. Enums for all classifications.
-│   (data layer)    │    Routing rules table. Confidence thresholds.
+│   ROUTE           │  ← Routing rules table lookup by insight type + urgency
+│   schema.py       │    Confidence ≥ 0.75 → auto-route
+│   router.py       │    Confidence < 0.75 → Human Review Queue
 └────────┬──────────┘
          │
          ▼
 ┌───────────────────┐
-│   router.py       │  ← Routes each insight → stakeholder destination.
-│   (routing)       │    Formats alerts. Generates CSM confirmations.
+│   ALERT           │  ← Structured alert: account context + verbatim quote
+│   router.py       │    + suggested action + SLA attached
 └────────┬──────────┘
          │
          ▼
-  Terminal Output / JSON
+┌───────────────────┐
+│   CONFIRM         │  ← CSM notified that insight landed
+│                   │    Closed-loop adoption mechanism
+└────────┬──────────┘
+         │
+         ▼
+  React UI cards / Terminal output / JSON payload
 ```
 
 ---
 
-## Files
+## Repository Files
 
 | File | Purpose |
 |------|---------|
-| `main.py` | Pipeline orchestrator — entry point |
+| `jtbd-feedback-loop.jsx` | React UI — paste transcript, run live extraction, view routed insights |
+| `main.py` | Python CLI pipeline orchestrator — entry point |
 | `prompts.py` | All prompts versioned and documented |
-| `schema.py` | Data structures, enums, routing rules |
+| `schema.py` | Data structures, enums, routing rules, confidence thresholds |
 | `error_handler.py` | Validation, fallback, failure handling |
 | `router.py` | Routing engine + alert formatters |
 | `sample_transcript.txt` | Realistic demo transcript (Acme Financial Services QBR) |
 | `requirements.txt` | `anthropic>=0.40.0` |
+
+---
+
+## The 7 Insight Types
+
+| Type | Icon | Routes To | SLA |
+|------|------|-----------|-----|
+| `BUG_REPORT` | 🐛 | Engineering | 24hr / 4hr CRITICAL |
+| `COMPETITOR_MENTION` | 🏢 | Sales Leadership | 48 hours |
+| `FEATURE_REQUEST` | 🔧 | Product Management | 1 week |
+| `PRICING_FRICTION` | 💰 | Sales + PM | 48 hours |
+| `CHURN_SIGNAL` | 🚨 | CS Leadership | 4 hours always |
+| `POSITIVE_SIGNAL` | ✅ | Product Management | 1 week |
+| `GENERAL_FEEDBACK` | 💬 | Product Management | 1 week |
+
+Confidence < 0.75 on any type → **Human Review Queue** regardless of insight type.
 
 ---
 
@@ -103,6 +153,15 @@ sample_transcript.txt
 
 **Layer 3 — Fallback Prompt** activates when primary extraction fails JSON validation. Simplifies the schema and retries. The model is told explicitly what failed — not asked to try generically.
 
+**Confidence calibration scale:**
+
+| Score | Meaning | Action |
+|-------|---------|--------|
+| 0.95+ | Explicit and unambiguous | Auto-route |
+| 0.85–0.94 | Clear but inferred | Auto-route |
+| 0.75–0.84 | Reasonably certain | Auto-route |
+| < 0.75 | Uncertain | Human Review Queue |
+
 ---
 
 ## Error Handling Strategy
@@ -115,6 +174,7 @@ sample_transcript.txt
 | Empty extraction | `handle_empty_extraction()` | Clean result, no crash |
 | API error | `handle_api_error()` | Log with full context, raise |
 | Both stages fail | Graceful degradation | Return empty with error note |
+| Response truncation (UI) | `max_tokens: 2000` | Sufficient for 6–8 full insight objects |
 
 ---
 
@@ -134,7 +194,7 @@ When Invoca adds a new team or changes an SLA, you update `ROUTING_RULES` in `sc
 
 ---
 
-## Sample Output (Mock Mode)
+## Sample UI Output
 
 ```
 ═════════════════════════════════════════════════════════════════
@@ -142,23 +202,39 @@ When Invoca adds a new team or changes an SLA, you update `ROUTING_RULES` in `sc
   Invoca Applied AI Analyst POC | Erwin M. McDonald
 ═════════════════════════════════════════════════════════════════
 
-  📞 Processing: Acme Financial Services
-  👤 CSM:        Jordan Rivera
-  📅 Date:       March 12, 2025
+  📞 Acme Financial Services   👤 Jordan Rivera   📅 March 12, 2025
+  💵 $284,000 ARR              🔁 Renewal: June 30, 2025
 
-  ✅ Extracted 6 insights
-     Auto-routing:    6 (confidence ≥ 75%)
-     Human review:    0 (confidence < 75%)
+  TOTAL INSIGHTS: 6   AUTO-ROUTED: 6   HUMAN REVIEW: 0   AVG CONFIDENCE: 96%
 
-ROUTING SUMMARY
-  → Customer Success Leadership  🔴 CRITICAL  Churn Signal      (93%)
-  → Engineering                  🔴 CRITICAL  Bug Report        (97%)
-  → Sales Leadership             🟠 HIGH      Competitor Mention (96%)
-  → Sales Leadership             🟠 HIGH      Pricing Friction  (98%)
-  → Product Management           🟡 MEDIUM    Feature Request   (91%)
-  → Product Management           🟢 LOW       Positive Signal   (99%)
+  STAKEHOLDER ROUTING SUMMARY
+  ─────────────────────────────────────────────────────────────────
+  ⚙️  Engineering              ⚡ CRITICAL   1 insight
+  🎯  CS Leadership            ⚡ CRITICAL   1 insight
+  📈  Sales Leadership                       2 insights
+  🗺️  Product Management                     2 insights
+
+  EXTRACTED INSIGHTS — SORTED BY URGENCY
+  ─────────────────────────────────────────────────────────────────
+  🐛 Bug Report               ● CRITICAL   Confidence: 97%
+  Call attribution data has been inconsistent for 6 weeks.
+  "We're making media spend decisions based on this data."
+  → Engineering | Escalate to P1. Owner + ETA by end of week.
+
+  🚨 Churn Signal             ● CRITICAL   Confidence: 93%
+  ...
 ```
 
 ---
 
-*JTBD Feedback Loop POC | Erwin M. McDonald | Invoca Applied AI Analyst Presentation*
+## Framework Credits
+
+| Framework | Author | Role |
+|-----------|--------|------|
+| **JTBD Feedback Loop v1.0** | Erwin M. McDonald | Core problem decomposition |
+| **AI Adoption Architect v2** | Erwin M. McDonald | Lens 3 stakeholder adoption strategy |
+| **Anthropic Claude API** | Anthropic | claude-sonnet-4-6 extraction engine |
+
+---
+
+*Built for the Invoca Applied AI Analyst final interview presentation.*
