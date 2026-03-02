@@ -11,13 +11,25 @@ Takes a raw customer call transcript → extracts structured business insights �
 
 **Two delivery modes — same pipeline logic, two entry points:**
 
-| Mode | Entry Point | Data | When to Use |
-|------|-------------|------|-------------|
-| **React UI (static)** | `dashboard/jtbd-dashboard.jsx` | Hardcoded mock (Acme Financial) | Demo presentation — shows the full system at scale |
-| **React UI (live)** | `dashboard/jtbd-feedback-loop.jsx` | Calls Claude API in real time | Proof of intelligence — paste any transcript and watch it run |
-| **Python CLI** | `poc/main.py` | Live API or `--mock` | Production-path code — inspectable, testable, deployable |
+| Mode | Entry Point | Data | API Key? | When to Use |
+|------|-------------|------|----------|-------------|
+| **React UI (static)** | `dashboard/jtbd-dashboard.jsx` | Hardcoded mock (Acme Financial) | ❌ None needed | Demo presentation — shows the full system at scale |
+| **React UI (live)** | `dashboard/jtbd-feedback-loop.jsx` | Calls Claude API in real time | ❌ None needed | Proof of intelligence — paste any transcript and watch it run |
+| **Python CLI** | `poc/main.py` | Live API or `--mock` | ✅ Required for live · ❌ Not needed for `--mock` | Production-path code — inspectable, testable, deployable |
 
 See [`dashboard/README.md`](../dashboard/README.md) for full React UI usage and demo sequence.
+
+---
+
+## Quick Start — React UI
+
+Both React artifacts run inside Claude.ai — **no API key, no build step, no npm install.**
+
+1. Open Claude.ai
+2. Upload or paste the `.jsx` file into the chat
+3. Click the rendered artifact to open full screen
+
+The live extraction UI (`jtbd-feedback-loop.jsx`) calls the Anthropic API through Claude.ai's built-in proxy. You never touch a key.
 
 ---
 
@@ -121,7 +133,7 @@ sample_transcript.txt  (or React UI paste)
 | `sample_transcript.txt` | `poc/` | Demo transcript — Acme Financial Services QBR (47 min) |
 | `requirements.txt` | `poc/` | `anthropic>=0.40.0` |
 | `jtbd-dashboard.jsx` | `dashboard/` | Static demo dashboard — hardcoded mock, full 4-lens story |
-| `jtbd-feedback-loop.jsx` | `dashboard/` | Live extraction UI — calls Claude API, `max_tokens: 2000` |
+| `jtbd-feedback-loop.jsx` | `dashboard/` | Live extraction UI — runs in Claude.ai, no API key needed |
 
 ---
 
