@@ -73,7 +73,20 @@ A Python pipeline powered by the Anthropic API that turns raw call transcripts i
 
 ## ⚡ Quick Start
 
-### Option A — Demo Mode (No API Key Required)
+### Option A — React UI (No API Key, No Setup)
+
+Both React artifacts run inside Claude.ai — **no API key, no build step, no npm install.**
+
+| Artifact | What It Does | How to Run |
+|----------|-------------|------------|
+| [`dashboard/jtbd-dashboard.jsx`](dashboard/jtbd-dashboard.jsx) | Static demo dashboard — full 4-lens story, hardcoded Acme Financial mock | Open in Claude.ai, click artifact |
+| [`dashboard/jtbd-feedback-loop.jsx`](dashboard/jtbd-feedback-loop.jsx) | Live extraction UI — paste any transcript, watch Claude extract and route in real time | Open in Claude.ai, paste transcript, hit ▶ RUN |
+
+**Demo sequence:** Dashboard first (vision) → Extraction UI (proof) → Python CLI (production)
+
+See [`dashboard/README.md`](dashboard/README.md) for full usage guide.
+
+### Option B — Python CLI Demo Mode (No API Key Required)
 
 > **⚠️ Windows note:** Always `cd` into `poc/` before running Python.
 > `main.py` and `sample_transcript.txt` must be in the same working directory.
@@ -95,7 +108,8 @@ python main.py --mock
 python main.py --mock --output json
 ```
 
-### Option B — Live Mode (With Anthropic API Key)
+### Option C — Python CLI Live Mode (With Anthropic API Key)
+
 ```powershell
 # Still inside poc/ ...
 
@@ -127,6 +141,11 @@ jtbd-feedback-loop/
 │   ├── sample_transcript.txt             ← Demo: Acme Financial QBR (47 min)
 │   ├── requirements.txt                  ← Dependencies (one: anthropic)
 │   └── README.md                         ← Technical walkthrough
+│
+├── 🖥 dashboard/                         ← React UI presentation layer
+│   ├── jtbd-dashboard.jsx                ← Static demo dashboard (hardcoded mock)
+│   ├── jtbd-feedback-loop.jsx            ← Live extraction UI (Claude API, no key needed)
+│   └── README.md                         ← Usage guide + demo sequence
 │
 ├── 📚 docs/                              ← All 4 presentation lenses
 │   ├── jtbd-map.md                       ← Lens 1: JTBD framework + workflow maps
@@ -393,7 +412,7 @@ Every failure mode has a named handler — not a generic `try/except`:
 
 | Phase | Horizon | What Changes |
 |-------|---------|-------------|
-| **Phase 1 — MVP** | Now | File-based transcript input, Python POC, single pipeline |
+| **Phase 1 — MVP** | Now | File-based transcript input, Python POC, React UI, single pipeline |
 | **Phase 2 — Integration** | 6 months | Native Invoca call stream, Salesforce write-back, Slack delivery |
 | **Phase 3 — Multi-Agent** | 12–18 months | Pattern aggregation agent, trend surfacing, proactive PM digest, multi-account cross-signal analysis |
 
