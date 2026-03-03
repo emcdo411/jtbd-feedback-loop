@@ -199,15 +199,3 @@ If ahead:
 * Expand compliance note
 
 ```
-
----
-
-If you’d like, I can now create:
-
-- 📄 A *clean executive-formatted PDF version*  
-- 📧 A short email body to send this with  
-- 🧠 A 25-minute condensed version  
-- 🎤 Or a “calm delivery” version that reduces cognitive load during recording  
-
-What do you want next?
-```
