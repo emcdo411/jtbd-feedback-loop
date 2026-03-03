@@ -10,15 +10,15 @@
 # CURRENT REPO STRUCTURE (as of March 2026):
 #
 #   jtbd-feedback-loop/
-#   ├── README.md                        ← Master overview
+#   ├── README.md                              ← Master overview
 #   ├── .gitignore
-#   ├── assets/                          ← Architecture diagrams + visuals
-#   ├── docs/                            ← All 4 presentation lenses
+#   ├── assets/                                ← Architecture diagrams + visuals
+#   ├── docs/                                  ← All 4 presentation lenses
 #   │   ├── jtbd-map.md
 #   │   ├── technical-architecture.md
 #   │   ├── stakeholder-mgmt.md
 #   │   └── future-state.md
-#   ├── poc/                             ← Python CLI pipeline
+#   ├── poc/                                   ← Python CLI pipeline
 #   │   ├── main.py
 #   │   ├── prompts.py
 #   │   ├── schema.py
@@ -27,14 +27,18 @@
 #   │   ├── sample_transcript.txt
 #   │   ├── requirements.txt
 #   │   └── README.md
-#   ├── dashboard/                       ← React UI presentation layer
-#   │   ├── README.md
-#   │   ├── jtbd-dashboard.jsx           ← Static demo dashboard (hardcoded mock)
-#   │   └── jtbd-feedback-loop.jsx       ← Live extraction UI (Claude API)
+#   ├── dashboard/                             ← React UI presentation layer (5 artifacts)
+#   │   ├── README.md                          ← Dashboard-specific docs
+#   │   ├── quick-launch.md                    ← One-command launch guide for Claude.ai
+#   │   ├── jtbd-dashboard.jsx                 ← Static 4-lens demo dashboard
+#   │   ├── jtbd-feedback-loop.jsx             ← Live extraction engine (calls Anthropic API)
+#   │   ├── jtbd-dashboard-explainer.jsx       ← Dashboard panel explainer (dual audience)
+#   │   ├── jtbd-pipeline-explainer.jsx        ← 7-stage pipeline explainer (dual audience)
+#   │   └── jtbdpoc-vs-invoca.jsx              ← POC vs Invoca platform comparison
 #   ├── skill/
 #   │   └── jtbd-feedback-loop.skill
 #   └── setup/
-#       └── create-repo.ps1              ← This script
+#       └── create-repo.ps1                    ← This script
 #
 # PREREQUISITES:
 #   1. GitHub CLI installed: https://cli.github.com/
@@ -168,16 +172,20 @@ if (Test-Path $sourcePath) {
         Write-Host "  ⚠  docs/ source not found — copy manually" -ForegroundColor Yellow
     }
 
-    # ── Dashboard (React UI artifacts) ────────────────────────────────
+    # ── Dashboard (React UI — all 5 JSX artifacts + docs) ─────────────
     if (Test-Path "$sourcePath\dashboard") {
         Copy-Item "$sourcePath\dashboard\*" -Destination "dashboard\" -Recurse -Force
-        Write-Host "  ✓ dashboard/ — React UI artifacts copied" -ForegroundColor Green
+        Write-Host "  ✓ dashboard/ — all 5 artifacts + docs copied" -ForegroundColor Green
     } else {
         Write-Host "  ⚠  dashboard/ source not found — copy manually" -ForegroundColor Yellow
         Write-Host "     Expected files:" -ForegroundColor DarkGray
-        Write-Host "       dashboard/jtbd-dashboard.jsx       (static demo dashboard)" -ForegroundColor DarkGray
-        Write-Host "       dashboard/jtbd-feedback-loop.jsx   (live extraction UI)" -ForegroundColor DarkGray
-        Write-Host "       dashboard/README.md                (usage guide)" -ForegroundColor DarkGray
+        Write-Host "       dashboard\README.md                      dashboard docs" -ForegroundColor DarkGray
+        Write-Host "       dashboard\quick-launch.md                Claude.ai launch guide" -ForegroundColor DarkGray
+        Write-Host "       dashboard\jtbd-dashboard.jsx             static 4-lens demo dashboard" -ForegroundColor DarkGray
+        Write-Host "       dashboard\jtbd-feedback-loop.jsx         live extraction UI (Anthropic API)" -ForegroundColor DarkGray
+        Write-Host "       dashboard\jtbd-dashboard-explainer.jsx   panel explainer, dual audience toggle" -ForegroundColor DarkGray
+        Write-Host "       dashboard\jtbd-pipeline-explainer.jsx    pipeline explainer, dual audience toggle" -ForegroundColor DarkGray
+        Write-Host "       dashboard\jtbdpoc-vs-invoca.jsx          POC vs Invoca comparison, side-by-side" -ForegroundColor DarkGray
     }
 
     # ── Skill ─────────────────────────────────────────────────────────
@@ -197,7 +205,7 @@ if (Test-Path $sourcePath) {
     # ── Root README ───────────────────────────────────────────────────
     if (Test-Path "$sourcePath\README.md") {
         Copy-Item "$sourcePath\README.md" -Destination "." -Force
-        Write-Host "  ✓ README.md copied" -ForegroundColor Green
+        Write-Host "  ✓ README.md — master overview copied" -ForegroundColor Green
     }
 
 } else {
@@ -206,7 +214,7 @@ if (Test-Path $sourcePath) {
     Write-Host "     Expected source structure:" -ForegroundColor DarkGray
     Write-Host "       $sourcePath\poc\           Python pipeline files" -ForegroundColor DarkGray
     Write-Host "       $sourcePath\docs\          4 presentation lens docs" -ForegroundColor DarkGray
-    Write-Host "       $sourcePath\dashboard\     React UI artifacts" -ForegroundColor DarkGray
+    Write-Host "       $sourcePath\dashboard\     React UI artifacts (5 JSX + docs)" -ForegroundColor DarkGray
     Write-Host "       $sourcePath\skill\         Claude skill file" -ForegroundColor DarkGray
     Write-Host "       $sourcePath\assets\        Diagrams + visuals" -ForegroundColor DarkGray
     Write-Host "       $sourcePath\README.md      Master README" -ForegroundColor DarkGray
@@ -284,33 +292,44 @@ git add .
 
 git commit -m "Initial commit: JTBD Feedback Loop Architect POC
 
-Python pipeline:
-- main.py            Pipeline orchestrator — entry point
-- prompts.py         3-layer prompt engineering strategy
-- schema.py          Typed data schema + confidence scoring
-- error_handler.py   2-stage fallback extraction engine
-- router.py          Stakeholder routing engine + alert formatters
+Python pipeline (poc/):
+- main.py                Pipeline orchestrator — entry point
+- prompts.py             3-layer prompt engineering strategy
+- schema.py              Typed data schema + confidence scoring
+- error_handler.py       2-stage fallback extraction engine
+- router.py              Stakeholder routing engine + alert formatters
 - sample_transcript.txt  Demo: Acme Financial QBR (47 min)
-- requirements.txt   Dependencies (one: anthropic)
-- poc/README.md      Technical deep-dive
+- requirements.txt       Dependencies (one: anthropic)
+- poc/README.md          Technical deep-dive
 
-Docs (4 presentation lenses):
-- docs/jtbd-map.md              Lens 1: JTBD framework + workflow maps
-- docs/technical-architecture.md Lens 2: Architecture decisions
-- docs/stakeholder-mgmt.md      Lens 3: Human adoption strategy
-- docs/future-state.md          Lens 4: 18-month evolution vision
+Docs — 4 presentation lenses (docs/):
+- jtbd-map.md                Lens 1: JTBD framework + workflow maps
+- technical-architecture.md  Lens 2: Architecture decisions
+- stakeholder-mgmt.md        Lens 3: Human adoption strategy
+- future-state.md            Lens 4: 18-month evolution vision
 
-React UI (dashboard/):
-- dashboard/jtbd-dashboard.jsx       Static demo dashboard (hardcoded mock)
-- dashboard/jtbd-feedback-loop.jsx   Live extraction UI (Claude API, max_tokens:2000)
-- dashboard/README.md                Usage guide + demo sequence
+React UI — 5 artifacts (dashboard/):
+- README.md                      Dashboard docs + artifact index
+- quick-launch.md                One-command launch guide for Claude.ai
+- jtbd-dashboard.jsx             Static 4-lens demo dashboard (hardcoded mock)
+- jtbd-feedback-loop.jsx         Live extraction UI (calls Anthropic API)
+- jtbd-dashboard-explainer.jsx   Dashboard panel explainer (dual audience toggle)
+- jtbd-pipeline-explainer.jsx    7-stage pipeline explainer (dual audience toggle)
+- jtbdpoc-vs-invoca.jsx          POC vs Invoca platform comparison (side-by-side)
 
 Supporting files:
 - skill/jtbd-feedback-loop.skill   Installable Claude JTBD skill
 - setup/create-repo.ps1            This repo scaffold script
-- README.md                        Master overview with full architecture
+- README.md                        Master overview + dashboard layer section
 
-Demo sequence: dashboard/ (vision) -> extraction UI (proof) -> poc/main.py (production)
+Demo sequence:
+  jtbd-dashboard.jsx          -> vision (what the system produces)
+  jtbd-feedback-loop.jsx      -> proof (live extraction, right now)
+  jtbd-pipeline-explainer.jsx -> clarity (any audience, any room)
+  jtbd-dashboard-explainer.jsx -> depth (panel by panel walkthrough)
+  jtbdpoc-vs-invoca.jsx       -> credibility (maps to Invoca actual stack)
+  poc/main.py --mock          -> production path (Python, no API key)
+
 Invoca Applied AI Analyst POC | Erwin M. McDonald"
 
 if ($LASTEXITCODE -ne 0) {
@@ -345,12 +364,16 @@ Write-Host "  Final structure:" -ForegroundColor White
 Write-Host "  ├── README.md" -ForegroundColor DarkGray
 Write-Host "  ├── .gitignore" -ForegroundColor DarkGray
 Write-Host "  ├── assets/" -ForegroundColor DarkGray
-Write-Host "  ├── docs/                   4 presentation lenses" -ForegroundColor DarkGray
-Write-Host "  ├── poc/                    Python CLI pipeline" -ForegroundColor DarkGray
-Write-Host "  ├── dashboard/              React UI artifacts  <- NEW" -ForegroundColor Green
+Write-Host "  ├── docs/                              4 presentation lenses" -ForegroundColor DarkGray
+Write-Host "  ├── poc/                               Python CLI pipeline" -ForegroundColor DarkGray
+Write-Host "  ├── dashboard/" -ForegroundColor Green
 Write-Host "  │   ├── README.md" -ForegroundColor Green
-Write-Host "  │   ├── jtbd-dashboard.jsx          static demo" -ForegroundColor Green
-Write-Host "  │   └── jtbd-feedback-loop.jsx       live extraction" -ForegroundColor Green
+Write-Host "  │   ├── quick-launch.md" -ForegroundColor Green
+Write-Host "  │   ├── jtbd-dashboard.jsx             static demo" -ForegroundColor Green
+Write-Host "  │   ├── jtbd-feedback-loop.jsx         live extraction" -ForegroundColor Green
+Write-Host "  │   ├── jtbd-dashboard-explainer.jsx   panel explainer" -ForegroundColor Green
+Write-Host "  │   ├── jtbd-pipeline-explainer.jsx    pipeline explainer" -ForegroundColor Green
+Write-Host "  │   └── jtbdpoc-vs-invoca.jsx          POC vs Invoca" -ForegroundColor Green
 Write-Host "  ├── skill/" -ForegroundColor DarkGray
 Write-Host "  └── setup/" -ForegroundColor DarkGray
 Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
