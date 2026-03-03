@@ -1,21 +1,17 @@
-<div align="center">
+# JTBD Feedback Loop
 
-<!-- BANNER -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1a2e,50:16213e,100:0f3460&height=200&section=header&text=JTBD%20Feedback%20Loop%20Architect&fontSize=36&fontColor=00d4ff&animation=fadeIn&fontAlignY=38&desc=Invoca%20Applied%20AI%20Analyst%20%7C%20Option%203%20POC&descAlignY=58&descColor=a0aec0" width="100%"/>
+![JTBD Feedback Loop Architect](https://capsule-render.vercel.app/api?type=waving&color=0:1a1a2e,50:16213e,100:0f3460&height=200&section=header&text=JTBD%20Feedback%20Loop%20Architect&fontSize=36&fontColor=00d4ff&animation=fadeIn&fontAlignY=38&desc=Invoca%20Applied%20AI%20Analyst%20%7C%20Option%203%20POC&descAlignY=58&descColor=a0aec0)
 
-<!-- BADGES ROW 1 — STACK -->
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Anthropic](https://img.shields.io/badge/Anthropic-Claude%20Sonnet-D97706?style=for-the-badge&logo=anthropic&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge&logo=opensourceinitiative&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-POC%20Ready-6366F1?style=for-the-badge&logo=checkmarx&logoColor=white)
 
-<!-- BADGES ROW 2 — META -->
 ![Framework](https://img.shields.io/badge/Framework-JTBD%20v1.0-C4226F?style=for-the-badge)
 ![Lenses](https://img.shields.io/badge/Lenses%20Covered-4%20of%204-00C49F?style=for-the-badge)
 ![Insights](https://img.shields.io/badge/Insight%20Types-7-FF6B6B?style=for-the-badge)
 ![Routing](https://img.shields.io/badge/Stakeholder%20Routing-Automated-4ECDC4?style=for-the-badge)
 
-<!-- BADGES ROW 3 — QUALITY -->
 ![Confidence Threshold](https://img.shields.io/badge/Confidence%20Threshold-75%25-yellow?style=for-the-badge&logo=target&logoColor=white)
 ![Error Handling](https://img.shields.io/badge/Error%20Handling-2--Stage%20Fallback-orange?style=for-the-badge&logo=shield&logoColor=white)
 ![Prompt Version](https://img.shields.io/badge/Prompt%20Version-v1.0.0-blueviolet?style=for-the-badge&logo=openai&logoColor=white)
@@ -32,8 +28,6 @@
 > *creating an 'insight black hole' for Product leadership."*
 >
 > — Invoca Applied AI Analyst Exercise Brief
-
-</div>
 
 ---
 
@@ -60,7 +54,7 @@ TRANSCRIPT IN → EXTRACT → SCORE → ROUTE → ALERT → CONFIRM → LOOP CLO
 A Python pipeline powered by the Anthropic API that turns raw call transcripts into structured, confidence-scored, stakeholder-routed intelligence — automatically:
 
 | Stage | What Happens |
-|-------|-------------|
+| --- | --- |
 | **Ingest** | Load raw call transcript from file (native Invoca stream in Phase 2) |
 | **Extract** | 3-layer prompt engineering strategy pulls 7 insight types |
 | **Score** | Every insight gets a confidence score (0.0–1.0) |
@@ -73,25 +67,12 @@ A Python pipeline powered by the Anthropic API that turns raw call transcripts i
 
 ## ⚡ Quick Start
 
-### Option A — React UI (No API Key, No Setup)
-
-Both React artifacts run inside Claude.ai — **no API key, no build step, no npm install.**
-
-| Artifact | What It Does | How to Run |
-|----------|-------------|------------|
-| [`dashboard/jtbd-dashboard.jsx`](dashboard/jtbd-dashboard.jsx) | Static demo dashboard — full 4-lens story, hardcoded Acme Financial mock | Open in Claude.ai, click artifact |
-| [`dashboard/jtbd-feedback-loop.jsx`](dashboard/jtbd-feedback-loop.jsx) | Live extraction UI — paste any transcript, watch Claude extract and route in real time | Open in Claude.ai, paste transcript, hit ▶ RUN |
-
-**Demo sequence:** Dashboard first (vision) → Extraction UI (proof) → Python CLI (production)
-
-See [`dashboard/README.md`](dashboard/README.md) for full usage guide.
-
-### Option B — Python CLI Demo Mode (No API Key Required)
+### Option A — Demo Mode (No API Key Required)
 
 > **⚠️ Windows note:** Always `cd` into `poc/` before running Python.
 > `main.py` and `sample_transcript.txt` must be in the same working directory.
 
-```powershell
+```bash
 # 1. Clone the repo
 git clone https://github.com/emcdo411/jtbd-feedback-loop.git
 
@@ -108,9 +89,9 @@ python main.py --mock
 python main.py --mock --output json
 ```
 
-### Option C — Python CLI Live Mode (With Anthropic API Key)
+### Option B — Live Mode (With Anthropic API Key)
 
-```powershell
+```bash
 # Still inside poc/ ...
 
 # Set your API key (Windows PowerShell)
@@ -132,6 +113,15 @@ jtbd-feedback-loop/
 │
 ├── 📄 README.md                          ← You are here — master overview
 │
+├── 📊 dashboard/                         ← React presentation layer (5 artifacts)
+│   ├── jtbd-dashboard.jsx                ← Static 4-lens demo dashboard
+│   ├── jtbd-feedback-loop.jsx            ← Live extraction engine (calls Anthropic API)
+│   ├── jtbd-dashboard-explainer.jsx      ← Dashboard panel explainer (dual audience)
+│   ├── jtbd-pipeline-explainer.jsx       ← 7-stage pipeline explainer (dual audience)
+│   ├── jtbdpoc-vs-invoca.jsx             ← POC vs Invoca platform comparison
+│   ├── README.md                         ← Dashboard-specific docs
+│   └── quick-launch.md                   ← One-command launch guide for Claude.ai
+│
 ├── 🔬 poc/                               ← Lens 2: The Build (working POC)
 │   ├── main.py                           ← Pipeline orchestrator — entry point
 │   ├── prompts.py                        ← 3-layer prompt engineering strategy
@@ -141,11 +131,6 @@ jtbd-feedback-loop/
 │   ├── sample_transcript.txt             ← Demo: Acme Financial QBR (47 min)
 │   ├── requirements.txt                  ← Dependencies (one: anthropic)
 │   └── README.md                         ← Technical walkthrough
-│
-├── 🖥 dashboard/                         ← React UI presentation layer
-│   ├── jtbd-dashboard.jsx                ← Static demo dashboard (hardcoded mock)
-│   ├── jtbd-feedback-loop.jsx            ← Live extraction UI (Claude API, no key needed)
-│   └── README.md                         ← Usage guide + demo sequence
 │
 ├── 📚 docs/                              ← All 4 presentation lenses
 │   ├── jtbd-map.md                       ← Lens 1: JTBD framework + workflow maps
@@ -161,6 +146,38 @@ jtbd-feedback-loop/
 │
 └── 🖼 assets/                            ← Architecture diagrams + visuals
     └── (diagrams referenced in docs)
+```
+
+---
+
+## 📊 Interactive Dashboard Layer
+
+All five React artifacts run inside [Claude.ai](https://claude.ai) — no build step, no npm install, no API key needed (except the live extraction UI, which uses Claude's built-in proxy).
+
+See [`dashboard/quick-launch.md`](./dashboard/quick-launch.md) for one-command launch instructions for each artifact.
+
+| Artifact | What It Shows | Audience |
+| --- | --- | --- |
+| `jtbd-dashboard.jsx` | Full system output at scale — KPIs, routing map, verbatim evidence, roadmap | All stakeholders |
+| `jtbd-feedback-loop.jsx` | Live extraction engine — paste a transcript, watch it route in real time | Technical evaluators |
+| `jtbd-dashboard-explainer.jsx` | Every dashboard panel explained for technical and non-technical audiences with audience toggle | Mixed rooms |
+| `jtbd-pipeline-explainer.jsx` | All 7 pipeline stages with code blocks, analogies, whiteboard flow, and bridge phrases | Mixed rooms |
+| `jtbdpoc-vs-invoca.jsx` | Your pipeline mapped against Invoca's actual tech stack, stage by stage | Technical deep-dives |
+
+### Recommended Demo Sequence
+
+```
+Step 1 → jtbd-dashboard.jsx            "Here's what the system produces at scale"
+              ↓
+Step 2 → jtbd-feedback-loop.jsx        "Here's the engine doing it live, right now"
+              ↓
+Step 3 → jtbd-pipeline-explainer.jsx   "Here's how each stage works — for any audience"
+              ↓
+Step 4 → jtbd-dashboard-explainer.jsx  "Here's what each panel means for your team"
+              ↓
+Step 5 → jtbdpoc-vs-invoca.jsx         "Here's how this maps to what Invoca ships — and where it goes further"
+              ↓
+Step 6 → poc/main.py --mock            "Here's the production-path Python code"
 ```
 
 ---
@@ -342,11 +359,11 @@ CallMetadata  ←  travels with every alert (CSM attribution preserved)
 ## 🧠 The Four Lenses — Covered
 
 | # | Lens | Document | Core Argument |
-|---|------|----------|---------------|
-| 1️⃣ | **Analyst** | [`docs/jtbd-map.md`](docs/jtbd-map.md) | Map the human first — 3 roles × 3 JTBD dimensions, friction audit, current/future state |
-| 2️⃣ | **Technical** | [`poc/README.md`](poc/README.md) + [`docs/technical-architecture.md`](docs/technical-architecture.md) | Raw Python chosen deliberately — every architecture decision is explicit and inspectable |
-| 3️⃣ | **Human** | [`docs/stakeholder-mgmt.md`](docs/stakeholder-mgmt.md) | Adoption resistance patterns by role, phased rollout, closed-loop trust mechanics |
-| 4️⃣ | **Innovator** | [`docs/future-state.md`](docs/future-state.md) | 3-phase evolution: file-based → Invoca stream → multi-agent, plus model cost curve impact |
+| --- | --- | --- | --- |
+| 1️⃣ | **Analyst** | [`docs/jtbd-map.md`](./docs/jtbd-map.md) | Map the human first — 3 roles × 3 JTBD dimensions, friction audit, current/future state |
+| 2️⃣ | **Technical** | [`poc/README.md`](./poc/README.md) + [`docs/technical-architecture.md`](./docs/technical-architecture.md) | Raw Python chosen deliberately — every architecture decision is explicit and inspectable |
+| 3️⃣ | **Human** | [`docs/stakeholder-mgmt.md`](./docs/stakeholder-mgmt.md) | Adoption resistance patterns by role, phased rollout, closed-loop trust mechanics |
+| 4️⃣ | **Innovator** | [`docs/future-state.md`](./docs/future-state.md) | 3-phase evolution: file-based → Invoca stream → multi-agent, plus model cost curve impact |
 
 ---
 
@@ -357,7 +374,7 @@ CallMetadata  ←  travels with every alert (CSM attribution preserved)
 Every friction point in the current state maps directly to a specific design decision in the code:
 
 | Current State Friction | Design Decision | Where in Code |
-|----------------------|-----------------|---------------|
+| --- | --- | --- |
 | CSM Time Tax | Auto-extraction — zero manual entry | `main.py` pipeline |
 | Judgment Erasure | CSM name + verbatim quote in every alert | `schema.py` → CallMetadata |
 | Signal Loss | Closed-loop CSM confirmation on routing | `router.py` → `format_csm_confirmation()` |
@@ -398,7 +415,7 @@ Layer 3 — FALLBACK_PROMPT (build_fallback_prompt)
 Every failure mode has a named handler — not a generic `try/except`:
 
 | Failure Mode | Handler | Outcome |
-|-------------|---------|---------|
+| --- | --- | --- |
 | JSON parse failure | `handle_json_parse_failure()` | Log + trigger fallback |
 | Schema validation error | `handle_validation_failure()` | Log field error + trigger fallback |
 | Both stages fail | Both handlers exhaust | Return empty ExtractionResult (not a crash) |
@@ -411,8 +428,8 @@ Every failure mode has a named handler — not a generic `try/except`:
 ## 🔭 The 18-Month Vision
 
 | Phase | Horizon | What Changes |
-|-------|---------|-------------|
-| **Phase 1 — MVP** | Now | File-based transcript input, Python POC, React UI, single pipeline |
+| --- | --- | --- |
+| **Phase 1 — MVP** | Now | File-based transcript input, Python POC, single pipeline |
 | **Phase 2 — Integration** | 6 months | Native Invoca call stream, Salesforce write-back, Slack delivery |
 | **Phase 3 — Multi-Agent** | 12–18 months | Pattern aggregation agent, trend surfacing, proactive PM digest, multi-account cross-signal analysis |
 
@@ -423,7 +440,7 @@ Model cost curves (GPT-4 class: ~95% cost reduction in 18 months) change what's 
 ## 🗂 Framework Credits
 
 | Framework | Author | Role in This Project |
-|-----------|--------|---------------------|
+| --- | --- | --- |
 | **JTBD Feedback Loop v1.0** | Erwin M. McDonald | Core framework driving the problem decomposition |
 | **AI Adoption Architect v2** | Erwin M. McDonald | Lens 3 stakeholder adoption strategy |
 | **Anthropic Claude API** | Anthropic | claude-sonnet-4-6 extraction engine |
@@ -443,10 +460,6 @@ Framework Builder:
 
 ---
 
-<div align="center">
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f3460,50:16213e,100:1a1a2e&height=120&section=footer&text=The%20insight%20was%20always%20there.&fontSize=20&fontColor=00d4ff&animation=fadeIn&fontAlignY=65" width="100%"/>
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:0f3460,50:16213e,100:1a1a2e&height=120&section=footer&text=The%20insight%20was%20always%20there.&fontSize=20&fontColor=00d4ff&animation=fadeIn&fontAlignY=65)
 
 *Built for the Invoca Applied AI Analyst final interview presentation.*
-
-</div>
