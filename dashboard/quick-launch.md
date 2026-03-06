@@ -9,9 +9,9 @@
 
 1. Open [claude.ai](https://claude.ai) in your browser
 2. Start a new conversation
-3. Copy the command for the artifact you want (below)
+3. Copy the **entire command block** for the artifact you want (below)
 4. Paste it into the chat and hit Enter
-5. Claude fetches the file from GitHub and renders it instantly
+5. Claude fetches the file and renders the interactive dashboard instantly
 
 ---
 
@@ -24,7 +24,9 @@
 **Use this first.** Shows the full system output — all 6 insights routed, KPI cards, routing map, verbatim evidence, confidence visualization, 18-month roadmap. Hardcoded mock data from the Acme Financial QBR. No waiting, no API call, loads instantly.
 
 ```
-Load this React artifact and render it: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-dashboard.jsx
+Fetch the React component from this URL: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-dashboard.jsx
+
+Read the full file contents, then render it as an interactive React artifact in this conversation.
 ```
 
 ---
@@ -34,7 +36,9 @@ Load this React artifact and render it: https://raw.githubusercontent.com/emcdo4
 **Use this second.** Paste any call transcript, hit RUN, and watch Claude extract insights, score confidence, and route stakeholders in real time. Calls the Anthropic API through Claude.ai's built-in proxy — no key needed.
 
 ```
-Load this React artifact and render it: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-feedback-loop.jsx
+Fetch the React component from this URL: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-feedback-loop.jsx
+
+Read the full file contents, then render it as an interactive React artifact in this conversation.
 ```
 
 ---
@@ -44,7 +48,9 @@ Load this React artifact and render it: https://raw.githubusercontent.com/emcdo4
 **Use this in mixed rooms.** Every dashboard panel explained for both technical and non-technical audiences. Toggle between 🔧 Technical, 💼 Executive, and ⚡ Both views. Includes a per-panel bridge phrase that works in any room. Click the left nav to jump between the 8 panels.
 
 ```
-Load this React artifact and render it: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-dashboard-explainer.jsx
+Fetch the React component from this URL: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-dashboard-explainer.jsx
+
+Read the full file contents, then render it as an interactive React artifact in this conversation.
 ```
 
 ---
@@ -54,7 +60,9 @@ Load this React artifact and render it: https://raw.githubusercontent.com/emcdo4
 **Use this to walk any audience through the 7 stages.** Technical view shows architecture, code blocks, and schema tags. Executive view shows plain-English analogies, the "why it matters" stakes, and a whiteboard flow with clickable steps. Bridge phrase at the bottom of every stage works in any room.
 
 ```
-Load this React artifact and render it: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-pipeline-explainer.jsx
+Fetch the React component from this URL: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-pipeline-explainer.jsx
+
+Read the full file contents, then render it as an interactive React artifact in this conversation.
 ```
 
 ---
@@ -64,7 +72,9 @@ Load this React artifact and render it: https://raw.githubusercontent.com/emcdo4
 **Use this for technical deep-dives.** 8 layers of your pipeline compared side-by-side against Invoca's actual technology stack — Signal AI, Invoca Exchange, Smart Alerts. Click any row to expand a full split panel with code blocks (your POC in teal, Invoca in gold) plus an analysis note with the interview angle for that layer. Filter by verdict using the KPI strip. The `YOU GO FURTHER ▲` row on the Closed Loop layer is your primary differentiator — that's the one to expand in the room.
 
 ```
-Load this React artifact and render it: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/poc-vs-invoca-duel.jsx
+Fetch the React component from this URL: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/poc-vs-invoca-duel.jsx
+
+Read the full file contents, then render it as an interactive React artifact in this conversation.
 ```
 
 ---
