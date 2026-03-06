@@ -110,7 +110,53 @@ The insight isn't missing. It exists — on every call, every day.
 [TRANSCRIPT INGESTION]
       │  ✅ Automatic — no CSM action required
       │  Supports: call recording export, manual transcript upload,
+      │  or [CUSTOMER CALL]
+      │  Insight is born — same as before
+      ▼
+[TRANSCRIPT INGESTION]
+      │  ✅ Automatic — no CSM action required
+      │  Supports: call recording export, manual transcript upload,
       │  or direct Invoca conversation intelligence stream (future state)
+      ▼
+[ENTITY EXTRACTION — AI LAYER]
+      │  ✅ Extracts: competitor mentions · feature requests ·
+      │     bug reports · pricing friction · churn signals ·
+      │     positive signals · general feedback
+      │  Source attribution preserved: CSM name + verbatim quote
+      ▼
+[CONFIDENCE SCORING]
+      │  ✅ Every insight scored 0.0 – 1.0
+      │     ≥ 0.75 → auto-route
+      │     < 0.75 → Human Review Queue (PM triages)
+      ▼
+[CLASSIFICATION + INTELLIGENT ROUTING]
+      │  ✅ Bug Report        → 🔧 Engineering (SLA: 24hrs / 4hrs if CRITICAL)
+      │  ✅ Competitor Mention → 💼 Sales Leadership (SLA: 48hrs)
+      │  ✅ Feature Request   → 📋 Product Management (SLA: 1 week)
+      │  ✅ Pricing Friction  → Pricing Friction → 💼 Sales Leadership + PM (SLA: 48hrs)
+      │  ✅ Churn Signal      → 🤝 CS Leadership (SLA: 4hrs — immediate)
+      ▼
+[STRUCTURED ALERT DELIVERED]
+      │  ✅ Consistent format every time:
+      │     TYPE · ACCOUNT · ARR · RENEWAL DATE
+      │     SUMMARY (2 sentences) · VERBATIM QUOTE
+      │     CONFIDENCE SCORE · ACTION REQUIRED · SUGGESTED ACTION
+      ▼
+[CSM CLOSED-LOOP CONFIRMATION]
+      │  ✅ "Your bug report from Acme Financial routed to Engineering.
+      │     SLA: 4 hours. Confidence: 97%."
+      │  CSM knows their input landed. Adoption follows confirmation.
+      ▼
+[PATTERN AGGREGATION — WEEKLY DIGEST]
+      │  ✅ "Pricing friction mentioned by 7 accounts in the past 30 days"
+      │  Turns one-off signals into defensible roadmap data
+      ▼
+[LOOP CONFIRMED CLOSED]
+         ✅ Recipient acknowledges.
+         ✅ CSM sees it.
+         ✅ PM acts with data, not anecdotes.
+         ✅ The insight that was born on the call
+            actually reaches the person who can do something about it.
       ▼
 [ENTITY EXTRACTION — AI LAYER]
       │  ✅ Extracts: competitor mentions · feature requests ·
