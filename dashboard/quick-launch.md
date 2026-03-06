@@ -59,12 +59,12 @@ Load this React artifact and render it: https://raw.githubusercontent.com/emcdo4
 
 ---
 
-### 5 — POC vs Invoca Comparison
+### 5 — POC vs Invoca Tech Stack Duel
 
-**Use this for technical deep-dives.** Your 7-step pipeline mapped side-by-side against Invoca's actual technology stack — Signal AI, PreSense, Invoca Exchange. Click any row to expand the Interview Insight for that stage. Filter by alignment type using the header badges. Summary card at the bottom includes the full comparative framing to use Friday.
+**Use this for technical deep-dives.** 8 layers of your pipeline compared side-by-side against Invoca's actual technology stack — Signal AI, Invoca Exchange, Smart Alerts. Click any row to expand a full split panel with code blocks (your POC in teal, Invoca in gold) plus an analysis note with the interview angle for that layer. Filter by verdict using the KPI strip. The `YOU GO FURTHER ▲` row on the Closed Loop layer is your primary differentiator — that's the one to expand in the room.
 
 ```
-Load this React artifact and render it: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbdpoc-vs-invoca.jsx
+Load this React artifact and render it: https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/poc-vs-invoca-duel.jsx
 ```
 
 ---
@@ -80,7 +80,7 @@ Step 3 → jtbd-pipeline-explainer.jsx   "Here's how each stage works — for an
               ↓
 Step 4 → jtbd-dashboard-explainer.jsx  "Here's what each panel means for your team"
               ↓
-Step 5 → jtbdpoc-vs-invoca.jsx         "Here's how this maps to what Invoca ships — and where it goes further"
+Step 5 → poc-vs-invoca-duel.jsx        "Here's how this maps to what Invoca ships — and where it goes further"
               ↓
 Step 6 → poc/main.py --mock            "Here's the production-path Python code"
 ```
@@ -93,7 +93,8 @@ Step 6 → poc/main.py --mock            "Here's the production-path Python code
 - **Full screen.** Click the expand icon on the rendered artifact for the best view.
 - **Demo transcript.** The live extraction UI (`jtbd-feedback-loop.jsx`) has a built-in "Load Demo Transcript" button — use it if you don't have a transcript handy.
 - **Audience toggle.** Both explainer artifacts have a toggle in the top-right corner — switch between Technical, Executive, and Both views without reloading.
-- **Filter by alignment.** In `jtbdpoc-vs-invoca.jsx`, click any alignment badge (Exact Match, Strong Align, etc.) in the header to filter the comparison to just those rows.
+- **Filter by verdict.** In `poc-vs-invoca-duel.jsx`, click any verdict badge (EXACT MATCH, STRONG ALIGN, PARTIAL ALIGN, YOU GO FURTHER) in the KPI strip to filter the comparison to just those rows.
+- **Expand the Closed Loop row.** That's the `YOU GO FURTHER ▲` row — the primary gap. Click it to surface the full analysis.
 - **Escape to close** any modal in the static dashboard.
 
 ---
@@ -106,7 +107,7 @@ Step 6 → poc/main.py --mock            "Here's the production-path Python code
 | Live Extraction UI | `https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-feedback-loop.jsx` |
 | Dashboard Explainer | `https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-dashboard-explainer.jsx` |
 | Pipeline Explainer | `https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbd-pipeline-explainer.jsx` |
-| POC vs Invoca | `https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/jtbdpoc-vs-invoca.jsx` |
+| POC vs Invoca Duel | `https://raw.githubusercontent.com/emcdo411/jtbd-feedback-loop/main/dashboard/poc-vs-invoca-duel.jsx` |
 
 ---
 
