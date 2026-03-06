@@ -48,20 +48,62 @@ The insight dies. Not because the CSM failed. **Because the system was never des
 ## 🚀 The Solution
 
 ```
-TRANSCRIPT IN → EXTRACT → SCORE → ROUTE → ALERT → CONFIRM → LOOP CLOSED
+TRANSCRIPT IN → EXTRACT → SCORE → GATE → ROUTE → ALERT → CONFIRM → LOOP CLOSED
 ```
 
-A Python pipeline powered by the Anthropic API that turns raw call transcripts into structured, confidence-scored, stakeholder-routed intelligence — automatically:
+A Python pipeline powered by the Anthropic API that turns raw call transcripts into structured, confidence-scored, stakeholder-routed intelligence — automatically.
 
-| Stage | What Happens |
-| --- | --- |
-| **Ingest** | Load raw call transcript from file (native Invoca stream in Phase 2) |
-| **Extract** | 3-layer prompt engineering strategy pulls 7 insight types |
-| **Score** | Every insight gets a confidence score (0.0–1.0) |
-| **Gate** | Below 0.75 → Human Review Queue, not auto-send |
-| **Route** | Insight type + urgency → correct stakeholder with SLA |
-| **Alert** | Structured alert: account context + verbatim quote + suggested action |
-| **Confirm** | CSM notified that their insight landed — the adoption mechanism |
+---
+
+## 🛠 Core Tech Stack
+
+| Layer | Technology | Detail |
+| --- | --- | --- |
+| **Language** | Python 3.11+ | Raw Python chosen deliberately — every architecture decision is explicit and inspectable |
+| **AI Model** | `claude-sonnet-4-6` | Anthropic's Sonnet-class model — production intelligence-to-latency balance |
+| **API Endpoint** | `POST /v1/messages` | Anthropic Messages API — single call returns all extracted insights as a JSON array |
+| **SDK** | `anthropic` Python package | `client.messages.create()` — primary and only AI call in the pipeline |
+| **Schema** | Typed Python `@dataclass` | `ExtractedInsight`, `RoutedAlert` — versioned alongside the prompt, not inline |
+| **Prompt Architecture** | 3-layer versioned system | `SYSTEM_PROMPT_v1` as a named constant — not an inline string, enabling version control |
+| **Confidence Scoring** | First-class required field | `confidence_score: float` — declared in schema, enforced in prompt, returned with every insight |
+| **Evidence Trail** | `verbatim_quote` required | Non-nullable schema field — the model cannot omit the exact customer words that triggered the insight |
+| **Gating Logic** | Deterministic Python conditional | `≥ 0.75` → auto-route · `< 0.75` → Human Review Queue — no ML at the gate layer |
+| **Routing Engine** | `ROUTING_RULES` dictionary | `InsightType` enum → `(destination_team, sla_string)` — deterministic, version-controlled |
+| **SLA Assignment** | Urgency-to-deadline mapping | `CRITICAL` → 4 hrs · `HIGH` → 48 hrs · `MEDIUM/LOW` → 1 week — assigned at schema level |
+| **Output** | JSON serialization | `RoutedAlert` dataclass → webhook-ready for Salesforce task creation, Slack, or Jira |
+| **Frontend POC** | React + Recharts | 5 dashboard artifacts running in Claude.ai — live Anthropic API calls from the browser client |
+| **Error Handling** | 2-stage fallback | `handle_json_parse_failure()` → `build_fallback_prompt()` → `handle_empty_extraction()` — no silent failures |
+
+### The Exact API Call
+
+```python
+# Python SDK — primary extraction call
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=4096,
+    system=SYSTEM_PROMPT_v1,       # versioned constant — not an inline string
+    messages=[{"role": "user", "content": transcript}]
+)
+
+# One call. All insights extracted. Returned as a typed JSON array.
+```
+
+### Key Architectural Decisions
+
+**`SYSTEM_PROMPT_v1` is a named constant, not an inline string.**
+This enables version control and prevents schema drift. The prompt is auditable like any other code artifact.
+
+**`confidence_score` is a required field in the dataclass.**
+The model is instructed in the system prompt that this field cannot be omitted. First-class confidence scoring — not inferred post-hoc.
+
+**`verbatim_quote` is non-nullable.**
+Every alert carries the exact customer sentence that triggered it. Eliminates hallucination risk in the evidence trail. When a CSM takes a churn risk to their VP, they quote the customer — not an AI summary.
+
+**No ML at the gate layer.**
+The 75% confidence gate is a single Python conditional. Deterministic, auditable, and fully testable. AI makes the classification. Deterministic logic makes the routing decision. Concerns are cleanly separated.
+
+**Enumerated insight types.**
+`InsightType` is a Python enum — 7 values, no free text. The model cannot return a type outside this set. Eliminates classification ambiguity downstream.
 
 ---
 
@@ -100,7 +142,7 @@ $env:ANTHROPIC_API_KEY = "your_key_here"
 # Run with the included demo transcript
 python main.py
 
-# Run with your own transcript (use the full path)
+# Run with your own transcript
 python main.py --transcript C:\path\to\your_transcript.txt
 ```
 
@@ -198,7 +240,7 @@ Step 6 → poc/main.py --mock            "Here's the production-path Python code
 ┌─────────────────────────────────▼────────────────────────────────────┐
 │  PROMPT ENGINEERING LAYER (prompts.py)                                │
 │                                                                       │
-│  Layer 1 — SYSTEM_PROMPT                                              │
+│  Layer 1 — SYSTEM_PROMPT_v1 (named constant, version-controlled)      │
 │    ├─ Persona: Senior CSM who's been on 10,000 enterprise calls       │
 │    ├─ Rules: Extract only what's explicit, score when uncertain       │
 │    └─ Output contract: JSON schema enforced at prompt level           │
@@ -216,9 +258,10 @@ Step 6 → poc/main.py --mock            "Here's the production-path Python code
                                   │
                       ┌───────────▼───────────┐
                       │  ANTHROPIC API CALL    │
+                      │  POST /v1/messages     │
                       │  claude-sonnet-4-6     │
                       │  max_tokens: 4096      │
-                      │  temp: default (1.0)   │
+                      │  system: SYSTEM_PROMPT_v1 │
                       └───────────┬───────────┘
                                   │
 ┌─────────────────────────────────▼────────────────────────────────────┐
@@ -269,25 +312,32 @@ Step 6 → poc/main.py --mock            "Here's the production-path Python code
 
 ### Data Model
 
-```
-ExtractedInsight
-├── insight_type:      InsightType (enum — 7 types)
-├── summary:           str (1-2 structured sentences)
-├── verbatim_quote:    Optional[str] (exact transcript words)
-├── sentiment:         SentimentLabel (positive / neutral / negative / critical)
-├── urgency:           UrgencyLevel (low / medium / high / critical)
-├── confidence_score:  float (0.0 – 1.0)
-├── routing_target:    RoutingDestination (enum — 5 destinations)
-├── competitor_named:  Optional[str]
-├── feature_requested: Optional[str]
-├── bug_description:   Optional[str]
-├── action_required:   bool
-└── suggested_action:  Optional[str]
+```python
+@dataclass
+class ExtractedInsight:
+    insight_type:      InsightType           # enum — 7 types, no free text
+    summary:           str                   # 1-2 structured sentences
+    verbatim_quote:    str                   # required — cannot be null
+    sentiment:         SentimentLabel        # positive / neutral / negative / critical
+    urgency:           UrgencyLevel          # low / medium / high / critical
+    confidence_score:  float                 # 0.0–1.0 — first-class required field
+    routing_target:    RoutingDestination    # enum — 5 destinations
+    competitor_named:  Optional[str]
+    feature_requested: Optional[str]
+    bug_description:   Optional[str]
+    action_required:   bool
+    suggested_action:  Optional[str]
 
-CallMetadata  ←  travels with every alert (CSM attribution preserved)
-├── csm_name, account_name, account_arr
-├── renewal_date, call_date, call_duration
-└── transcript_id
+# CallMetadata travels with every alert — CSM attribution is never lost
+@dataclass
+class CallMetadata:
+    csm_name:       str
+    account_name:   str
+    account_arr:    float
+    renewal_date:   str
+    call_date:      str
+    call_duration:  str
+    transcript_id:  str
 ```
 
 ---
@@ -390,7 +440,7 @@ Every friction point in the current state maps directly to a specific design dec
 The `prompts.py` file is the entire prompt architecture made explicit. Three layers, all versioned:
 
 ```
-Layer 1 — SYSTEM_PROMPT
+Layer 1 — SYSTEM_PROMPT_v1 (named constant)
   Sets the model's working identity as a senior B2B CSM.
   Establishes output contract (JSON schema enforced at prompt level).
   Defines confidence score calibration scale.
@@ -443,7 +493,7 @@ Model cost curves (GPT-4 class: ~95% cost reduction in 18 months) change what's 
 | --- | --- | --- |
 | **JTBD Feedback Loop v1.0** | Erwin M. McDonald | Core framework driving the problem decomposition |
 | **AI Adoption Architect v2** | Erwin M. McDonald | Lens 3 stakeholder adoption strategy |
-| **Anthropic Claude API** | Anthropic | claude-sonnet-4-6 extraction engine |
+| **Anthropic Claude API** | Anthropic | `claude-sonnet-4-6` via `POST /v1/messages` — extraction engine |
 
 ---
 
