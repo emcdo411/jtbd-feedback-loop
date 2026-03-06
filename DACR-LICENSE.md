@@ -72,7 +72,7 @@ Commercial licenses may include:
 
 To request a commercial license:
 
-contact: erwinmcdonald@proton.me
+contact: erwin.mcdonald@outlook.com
 
 ---
 
